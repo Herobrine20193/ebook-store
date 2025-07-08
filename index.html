@@ -372,6 +372,16 @@
       </div>
     </div>
 
+    <!-- ---------------------newsletter signup------------------- -->
+    <div class="newsletter" style="background:#fff;border-radius:12px;box-shadow:0 2px 12px #0001;padding:2em 1.5em 1.5em 1.5em;max-width:650px;margin:2em auto 2em auto;text-align:center;">
+      <h2 style="color:#ff523b;">Subscribe to our Newsletter</h2>
+      <p style="color:#444;">Get updates on new releases, offers, and more.</p>
+      <form id="newsletter-form" style="display:flex;gap:0.7em;justify-content:center;flex-wrap:wrap;margin-top:1em;">
+        <input type="email" id="newsletter-email" placeholder="Your email" required style="padding:8px 14px;border-radius:4px;border:1px solid #ddd;font-size:1em;min-width:220px;">
+        <button type="submit" class="btn" style="padding:8px 22px;">Subscribe</button>
+      </form>
+      <div id="newsletter-msg" style="margin-top:10px;font-size:1em;"></div>
+    </div>
     <!-- ---------------------footer------------------- -->
     <div class="footer">
       <div class="container">
@@ -410,65 +420,56 @@
         <p class="copyright">Copyright 2025 - Readly</p>
       </div>
     </div>
-    <!-- ---------------------newsletter signup------------------- -->
-    <!-- ...existing code... -->
-    <div class="newsletter" style="background:#fff;border-radius:12px;box-shadow:0 2px 12px #0001;padding:2em 1.5em 1.5em 1.5em;max-width:650px;margin:2em auto 2em auto;text-align:center;">
-      <h2 style="color:#ff523b;">Subscribe to our Newsletter</h2>
-      <p style="color:#444;">Get updates on new releases, offers, and more.</p>
-      <form id="newsletter-form" style="display:flex;gap:0.7em;justify-content:center;flex-wrap:wrap;margin-top:1em;">
-        <input type="email" id="newsletter-email" placeholder="Your email" required style="padding:8px 14px;border-radius:4px;border:1px solid #ddd;font-size:1em;min-width:220px;">
-        <button type="submit" class="btn" style="padding:8px 22px;">Subscribe</button>
-      </form>
-      <div id="newsletter-msg" style="margin-top:10px;font-size:1em;"></div>
-    </div>
-    // Wishlist/favorites logic
-    document.addEventListener('DOMContentLoaded', function() {
-      function getWishlistKey() {
-        const user = JSON.parse(localStorage.getItem('loggedInUser'));
-        return user ? `wishlist_${user.username}` : 'wishlist_guest';
-      }
-      function getWishlist() {
-        const key = getWishlistKey();
-        try {
-          return JSON.parse(localStorage.getItem(key)) || [];
-        } catch { return []; }
-      }
-      function setWishlist(arr) {
-        const key = getWishlistKey();
-        localStorage.setItem(key, JSON.stringify(arr));
-      }
-      function updateWishlistIcons() {
-        const wishlist = getWishlist();
+    <script>
+      // Wishlist/favorites logic
+      document.addEventListener('DOMContentLoaded', function() {
+        function getWishlistKey() {
+          const user = JSON.parse(localStorage.getItem('loggedInUser'));
+          return user ? `wishlist_${user.username}` : 'wishlist_guest';
+        }
+        function getWishlist() {
+          const key = getWishlistKey();
+          try {
+            return JSON.parse(localStorage.getItem(key)) || [];
+          } catch { return []; }
+        }
+        function setWishlist(arr) {
+          const key = getWishlistKey();
+          localStorage.setItem(key, JSON.stringify(arr));
+        }
+        function updateWishlistIcons() {
+          const wishlist = getWishlist();
+          document.querySelectorAll('.wishlist-btn').forEach(btn => {
+            const bookId = btn.getAttribute('data-book-id');
+            const icon = btn.querySelector('i');
+            if (wishlist.includes(bookId)) {
+              icon.classList.remove('fa-heart-o');
+              icon.classList.add('fa-heart');
+              btn.title = 'Remove from Wishlist';
+            } else {
+              icon.classList.remove('fa-heart');
+              icon.classList.add('fa-heart-o');
+              btn.title = 'Add to Wishlist';
+            }
+          });
+        }
         document.querySelectorAll('.wishlist-btn').forEach(btn => {
-          const bookId = btn.getAttribute('data-book-id');
-          const icon = btn.querySelector('i');
-          if (wishlist.includes(bookId)) {
-            icon.classList.remove('fa-heart-o');
-            icon.classList.add('fa-heart');
-            btn.title = 'Remove from Wishlist';
-          } else {
-            icon.classList.remove('fa-heart');
-            icon.classList.add('fa-heart-o');
-            btn.title = 'Add to Wishlist';
-          }
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const bookId = btn.getAttribute('data-book-id');
+            let wishlist = getWishlist();
+            if (wishlist.includes(bookId)) {
+              wishlist = wishlist.filter(id => id !== bookId);
+            } else {
+              wishlist.push(bookId);
+            }
+            setWishlist(wishlist);
+            updateWishlistIcons();
+          });
         });
-      }
-      document.querySelectorAll('.wishlist-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          const bookId = btn.getAttribute('data-book-id');
-          let wishlist = getWishlist();
-          if (wishlist.includes(bookId)) {
-            wishlist = wishlist.filter(id => id !== bookId);
-          } else {
-            wishlist.push(bookId);
-          }
-          setWishlist(wishlist);
-          updateWishlistIcons();
-        });
+        updateWishlistIcons();
       });
-      updateWishlistIcons();
-    });
+    </script>
     <script>
       document.getElementById('newsletter-form').onsubmit = function(e) {
         e.preventDefault();

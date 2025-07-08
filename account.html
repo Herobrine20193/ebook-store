@@ -159,9 +159,13 @@
                   <div id="twofa-msg" style="font-size:13px;margin-top:8px;"></div>
                 </form>
                 <div style="text-align:center;margin:18px 0 10px 0;color:#888;font-size:15px;">or sign in with</div>
-                <div style="display:flex;gap:1em;justify-content:center;margin-bottom:18px;">
-                  <button type="button" class="btn social-btn" id="google-login" style="background:#fff;color:#222;border:1px solid #ddd;"><img src="images/google.png" alt="Google" style="width:20px;vertical-align:middle;margin-right:6px;">Google</button>
-                  <button type="button" class="btn social-btn" id="fb-login" style="background:#fff;color:#222;border:1px solid #ddd;"><img src="images/facebook.png" alt="Facebook" style="width:20px;vertical-align:middle;margin-right:6px;">Facebook</button>
+                <div style="display:flex;gap:1em;justify-content:center;margin-bottom:18px;flex-wrap:wrap;">
+                  <button type="button" class="btn social-btn" id="google-login" style="background:#fff;color:#222;border:1px solid #ddd;display:flex;align-items:center;gap:6px;min-width:140px;justify-content:center;box-shadow:0 1px 6px #0001;transition:box-shadow 0.2s;">
+                    <img src="images/google.png" alt="Google" style="width:20px;vertical-align:middle;">Google
+                  </button>
+                  <button type="button" class="btn social-btn" id="fb-login" style="background:#fff;color:#222;border:1px solid #ddd;display:flex;align-items:center;gap:6px;min-width:140px;justify-content:center;box-shadow:0 1px 6px #0001;transition:box-shadow 0.2s;">
+                    <img src="images/facebook.png" alt="Facebook" style="width:20px;vertical-align:middle;">Facebook
+                  </button>
                 </div>
                 <script>
                   document.getElementById('google-login').onclick = function() {
