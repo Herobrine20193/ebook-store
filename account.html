@@ -292,14 +292,20 @@
       });
     </script>
     <script>
-      // MIGRATION: Ensure all users have isAdmin and hashed password
+      // MIGRATION: Remove 'admin' user and set 'ItzmeTejas' as admin
       function migrateUsers() {
         let users = getUsers();
         let changed = false;
+        // Remove 'admin' user
+        const before = users.length;
+        users = users.filter(u => u.username !== 'admin');
+        if (users.length !== before) changed = true;
+        // Set 'ItzmeTejas' as admin
         users.forEach(u => {
-          if (typeof u.isAdmin === 'undefined') {
-            u.isAdmin = (u.username === 'admin');
-            changed = true;
+          if (u.username === 'ItzmeTejas') {
+            if (!u.isAdmin) { u.isAdmin = true; changed = true; }
+          } else if (typeof u.isAdmin === 'undefined') {
+            u.isAdmin = false; changed = true;
           }
           // If password is not a string or is too short, hash it (very basic check)
           if (u.password && u.password.length < 10 && u.password === u.password.replace(/[^0-9]/g, '')) {
