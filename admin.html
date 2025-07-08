@@ -31,10 +31,9 @@
     </div>
   </div>
   <script>
-    // Only allow admin (username: admin, password: admin123)
-    const adminUser = { username: 'admin', password: 'admin123' };
+    // Only allow admin (isAdmin property)
     let user = JSON.parse(localStorage.getItem('loggedInUser'));
-    if (!user || user.username !== 'admin') {
+    if (!user || !user.isAdmin) {
       document.getElementById('admin-section').innerHTML = '<p style="color:red;">Access denied. Only admin can view this page.</p>';
       throw new Error('Not admin');
     }
@@ -61,16 +60,30 @@
       saveBooks();
       renderBooks();
     };
-    // User management
+    // User management (with admin toggle)
     function renderUsers() {
       let users = JSON.parse(localStorage.getItem('users')||'[]');
-      let html = '<h3>Users</h3><table border="1" style="width:100%;margin-bottom:20px;"><tr><th>Username</th><th>Email</th><th>Action</th></tr>';
+      let html = '<h3>Users</h3><table border="1" style="width:100%;margin-bottom:20px;"><tr><th>Username</th><th>Email</th><th>Admin</th><th>Action</th></tr>';
       users.forEach((u,i) => {
-        html += `<tr><td>${u.username}</td><td>${u.email}</td><td><button onclick="deleteUser(${i})">Delete</button></td></tr>`;
+        html += `<tr><td>${u.username}</td><td>${u.email}</td><td>${u.isAdmin ? 'Yes' : 'No'} <button onclick="toggleAdmin(${i})">${u.isAdmin ? 'Remove' : 'Make'} Admin</button></td><td><button onclick="deleteUser(${i})">Delete</button></td></tr>`;
       });
       html += '</table>';
       document.getElementById('admin-section').innerHTML += html;
     }
+    window.toggleAdmin = function(idx) {
+      let users = JSON.parse(localStorage.getItem('users')||'[]');
+      users[idx].isAdmin = !users[idx].isAdmin;
+      localStorage.setItem('users', JSON.stringify(users));
+      // If demoting self, log out
+      let logged = JSON.parse(localStorage.getItem('loggedInUser'));
+      if (logged && logged.username === users[idx].username && !users[idx].isAdmin) {
+        localStorage.removeItem('loggedInUser');
+        alert('You have removed your own admin access. Logging out.');
+        window.location.href = 'account.html';
+        return;
+      }
+      renderAdmin();
+    };
     window.deleteUser = function(idx) {
       let users = JSON.parse(localStorage.getItem('users')||'[]');
       users.splice(idx,1);

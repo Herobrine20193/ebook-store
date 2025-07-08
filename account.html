@@ -228,7 +228,10 @@
         if (users.find(u => u.email === email)) {
           showMessage('Email already registered.', true); return;
         }
-        users.push({ username, email, password: hash(password) });
+        // Make the first admin account (admin/admin123) isAdmin by default
+        let isAdmin = false;
+        if (username === 'admin' && password === 'admin123') isAdmin = true;
+        users.push({ username, email, password: hash(password), isAdmin });
         saveUsers(users);
         showMessage('Sign up successful! You can now sign in.');
         signIn();
@@ -287,6 +290,28 @@
           };
         }
       });
+    </script>
+    <script>
+      // MIGRATION: Ensure all users have isAdmin and hashed password
+      function migrateUsers() {
+        let users = getUsers();
+        let changed = false;
+        users.forEach(u => {
+          if (typeof u.isAdmin === 'undefined') {
+            u.isAdmin = (u.username === 'admin');
+            changed = true;
+          }
+          // If password is not a string or is too short, hash it (very basic check)
+          if (u.password && u.password.length < 10 && u.password === u.password.replace(/[^0-9]/g, '')) {
+            // Already hashed (number string), skip
+          } else if (u.password && u.password.length < 20) {
+            u.password = hash(u.password);
+            changed = true;
+          }
+        });
+        if (changed) saveUsers(users);
+      }
+      migrateUsers();
     </script>
   </body>
 </html>
