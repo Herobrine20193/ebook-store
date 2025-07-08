@@ -122,16 +122,9 @@
       </div>
     </div>
     <!-- ---------Javascript for toggle menu------------- -->
+    <script src="cart-shared.js"></script>
     <script>
-      var MenuItems = document.getElementById("MenuItems");
-      MenuItems.style.maxHeight = "0px";
-      function menutoggle() {
-        if (MenuItems.style.maxHeight == "0px") {
-          MenuItems.style.maxHeight = "200px";
-        } else {
-          MenuItems.style.maxHeight = "0px";
-        }
-      }
+      // Menu toggle is handled by cart-shared.js
     </script>
     <!-- -----------js for toggle form------------------ -->
     <script>
@@ -150,6 +143,71 @@
         indicator.style.transform = "translateX(100px)";
       }
     </script>
+    <!-- -----------js for sign in/sign up functionality ------------------ -->
+    <script>
+      // Helper: get users from localStorage
+      function getUsers() {
+        return JSON.parse(localStorage.getItem('users') || '[]');
+      }
+      // Helper: save users to localStorage
+      function saveUsers(users) {
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+      // Helper: show message
+      function showMessage(msg, isError = false) {
+        let msgDiv = document.getElementById('account-msg');
+        if (!msgDiv) {
+          msgDiv = document.createElement('div');
+          msgDiv.id = 'account-msg';
+          msgDiv.style.margin = '10px 0';
+          msgDiv.style.padding = '10px';
+          msgDiv.style.borderRadius = '5px';
+          signInForm.parentNode.insertBefore(msgDiv, signInForm);
+        }
+        msgDiv.textContent = msg;
+        msgDiv.style.background = isError ? '#EF6257' : '#72EF57';
+        msgDiv.style.color = '#fff';
+        msgDiv.style.fontSize = '14px';
+      }
+      // SIGN UP
+      signUpForm.onsubmit = function(e) {
+        e.preventDefault();
+        const username = signUpForm.querySelector('input[type="text"]').value.trim();
+        const email = signUpForm.querySelector('input[type="email"]').value.trim();
+        const password = signUpForm.querySelector('input[type="password"]').value;
+        if (!username || !email || !password) {
+          showMessage('Please fill all fields.', true); return;
+        }
+        let users = getUsers();
+        if (users.find(u => u.username === username)) {
+          showMessage('Username already exists.', true); return;
+        }
+        if (users.find(u => u.email === email)) {
+          showMessage('Email already registered.', true); return;
+        }
+        users.push({ username, email, password });
+        saveUsers(users);
+        showMessage('Sign up successful! You can now sign in.');
+        signIn();
+        signUpForm.reset();
+      };
+      // SIGN IN
+      signInForm.onsubmit = function(e) {
+        e.preventDefault();
+        const username = signInForm.querySelector('input[type="text"]').value.trim();
+        const password = signInForm.querySelector('input[type="password"]').value;
+        let users = getUsers();
+        const user = users.find(u => u.username === username && u.password === password);
+        if (user) {
+          showMessage('Sign in successful! Welcome, ' + user.username + '.');
+          // Save session (for demo, just a flag)
+          localStorage.setItem('loggedInUser', JSON.stringify(user));
+          setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+        } else {
+          showMessage('Invalid username or password.', true);
+        }
+      };
+    </script>
     <!-- -----------------js for form validation ------------------ -->
     <script>
       function formvalidate() {
@@ -164,8 +222,29 @@
           document.getElementById("uname").style.fontSize = "12px";
         }
       }
-
       document.myform.uname.addEventListener("blur", formvalidate);
+    </script>
+    <!-- --------- Show logged in user and sign out button --------- -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const user = JSON.parse(localStorage.getItem('loggedInUser'));
+        if (user) {
+          // Hide forms, show welcome and sign out
+          document.querySelector('.form-btn').style.display = 'none';
+          let msgDiv = document.createElement('div');
+          msgDiv.style.margin = '30px 0';
+          msgDiv.style.padding = '20px';
+          msgDiv.style.background = '#f6f6f6';
+          msgDiv.style.borderRadius = '8px';
+          msgDiv.style.textAlign = 'center';
+          msgDiv.innerHTML = `<h2>Welcome, <span style='color:#ff523b'>${user.username}</span>!</h2><p>You are signed in.</p><button id='signOutBtn' class='btn' style='margin-top:20px;'>Sign Out</button>`;
+          document.querySelector('.form-container').appendChild(msgDiv);
+          document.getElementById('signOutBtn').onclick = function() {
+            localStorage.removeItem('loggedInUser');
+            window.location.reload();
+          };
+        }
+      });
     </script>
   </body>
 </html>

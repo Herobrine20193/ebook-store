@@ -386,5 +386,24 @@
         }
       }
     </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const user = JSON.parse(localStorage.getItem('loggedInUser'));
+        const nav = document.querySelector('.navbar nav ul');
+        if (user) {
+          // Remove Account link
+          const accountLi = Array.from(nav.children).find(li => li.textContent.trim() === 'Account');
+          if (accountLi) accountLi.remove();
+          // Add user and sign out
+          const userLi = document.createElement('li');
+          userLi.innerHTML = `<span style="color:#ff523b;font-weight:600;">${user.username}</span> <button id="signOutBtn" style="margin-left:10px;padding:4px 10px;border:none;background:#ff523b;color:#fff;border-radius:4px;cursor:pointer;">Sign Out</button>`;
+          nav.appendChild(userLi);
+          document.getElementById('signOutBtn').onclick = function() {
+            localStorage.removeItem('loggedInUser');
+            window.location.reload();
+          };
+        }
+      });
+    </script>
   </body>
 </html>

@@ -15,6 +15,7 @@
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
     />
+    <script src="cart-shared.js"></script>
   </head>
 
   <body>
@@ -50,70 +51,39 @@
 
     <!-- ---------- cart items details------------- -->
     <div class="small-container cart-page">
-      <table>
+      <div id="cart-empty" class="cart-empty" style="display: none;">
+        <h2>Your cart is empty</h2>
+        <p>Add some books to your cart to see them here.</p>
+        <a href="ebooks.html" class="btn">Browse Ebooks</a>
+      </div>
+      <table id="cart-table">
         <tr>
           <th>Ebook</th>
           <th>Quantity</th>
           <th>Subtotal</th>
         </tr>
-        <tr>
-          <td>
-            <div class="cart-info">
-              <img src="images/Book 16.jpg" alt="Book 16" />
-              <div>
-                <p>Anna Karenina</p>
-                <small>Price: Rs500.00</small> <br />
-                <a href="">Remove</a>
-              </div>
-            </div>
-          </td>
-          <td><input type="number" value="1" /></td>
-          <td>Rs500.00</td>
-        </tr>
-        <tr>
-          <td>
-            <div class="cart-info">
-              <img src="images/Book 5.jpg" alt="Book 5" />
-              <div>
-                <p>Anna Karenina</p>
-                <small>Price: Rs500.00</small> <br />
-                <a href="">Remove</a>
-              </div>
-            </div>
-          </td>
-          <td><input type="number" value="1" /></td>
-          <td>Rs500.00</td>
-        </tr>
-        <tr>
-          <td>
-            <div class="cart-info">
-              <img src="images/Book 6.jpg" alt="Book 6" />
-              <div>
-                <p>Anna Karenina</p>
-                <small>Price: Rs500.00</small> <br />
-                <a href="">Remove</a>
-              </div>
-            </div>
-          </td>
-          <td><input type="number" value="1" /></td>
-          <td>Rs500.00</td>
-        </tr>
+        <tbody id="cart-items">
+          <!-- Cart items will be populated by JavaScript -->
+        </tbody>
       </table>
       <div class="total-price">
         <table>
           <tr>
             <td>Subtotal</td>
-            <td>Rs1500.00</td>
+            <td id="subtotal">Rs0.00</td>
           </tr>
           <tr>
-            <td>Tax</td>
-            <td>Rs100.00</td>
+            <td>Tax (8%)</td>
+            <td id="tax">Rs0.00</td>
           </tr>
           <tr>
             <td>Total</td>
-            <td>Rs1600.00</td>
+            <td id="total">Rs0.00</td>
           </tr>
         </table>
+        <div class="checkout-btn">
+          <button class="btn" onclick="checkout()">Proceed to Checkout</button>
+        </div>
       </div>
     </div>
     <!-- ---------------------footer------------------- -->
@@ -154,17 +124,151 @@
         <p class="copyright">Copyright 2025 - Readly</p>
       </div>
     </div>
-    <!-- ---------Javascript for toggle menu------------- -->
+    <!-- ---------Javascript for cart page specific functionality------------- -->
     <script>
-      var MenuItems = document.getElementById("MenuItems");
-      MenuItems.style.maxHeight = "0px";
-      function menutoggle() {
-        if (MenuItems.style.maxHeight == "0px") {
-          MenuItems.style.maxHeight = "200px";
-        } else {
-          MenuItems.style.maxHeight = "0px";
+      // Initialize cart with some sample items if empty
+      if (cart.length === 0) {
+        cart = [
+          { id: 'book16', quantity: 1 },
+          { id: 'book5', quantity: 1 },
+          { id: 'book6', quantity: 1 }
+        ];
+        localStorage.setItem('cart', JSON.stringify(cart));
+      }
+
+      // Function to remove item from cart
+      function removeFromCart(bookId) {
+        cart = cart.filter(item => item.id !== bookId);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        displayCart();
+        updateCartIcon();
+      }
+
+      // Function to update quantity
+      function updateQuantity(bookId, newQuantity) {
+        const item = cart.find(item => item.id === bookId);
+        if (item) {
+          if (newQuantity <= 0) {
+            removeFromCart(bookId);
+          } else {
+            item.quantity = newQuantity;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            displayCart();
+            updateCartIcon();
+          }
         }
       }
+
+      // Function to calculate totals
+      function calculateTotals() {
+        let subtotal = 0;
+        
+        cart.forEach(item => {
+          const book = books[item.id];
+          if (book) {
+            subtotal += book.price * item.quantity;
+          }
+        });
+
+        const tax = subtotal * TAX_RATE;
+        const total = subtotal + tax;
+
+        return { subtotal, tax, total };
+      }
+
+      // Function to display cart
+      function displayCart() {
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartEmpty = document.getElementById('cart-empty');
+        const cartTable = document.getElementById('cart-table');
+        
+        if (cart.length === 0) {
+          cartEmpty.style.display = 'block';
+          cartTable.style.display = 'none';
+          return;
+        }
+
+        cartEmpty.style.display = 'none';
+        cartTable.style.display = 'table';
+
+        cartItemsContainer.innerHTML = '';
+
+        cart.forEach(item => {
+          const book = books[item.id];
+          if (book) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>
+                <div class="cart-info">
+                  <img src="${book.image}" alt="${book.title}" />
+                  <div>
+                    <p>${book.title}</p>
+                    <small>Price: Rs${book.price}.00</small> <br />
+                    <a href="#" onclick="removeFromCart('${book.id}')">Remove</a>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <input type="number" value="${item.quantity}" min="1" 
+                       onchange="updateQuantity('${book.id}', parseInt(this.value))" />
+              </td>
+              <td>Rs${(book.price * item.quantity).toFixed(2)}</td>
+            `;
+            cartItemsContainer.appendChild(row);
+          }
+        });
+
+        // Update totals
+        const { subtotal, tax, total } = calculateTotals();
+        document.getElementById('subtotal').textContent = `Rs${subtotal.toFixed(2)}`;
+        document.getElementById('tax').textContent = `Rs${tax.toFixed(2)}`;
+        document.getElementById('total').textContent = `Rs${total.toFixed(2)}`;
+      }
+
+      // Function to handle checkout
+      function checkout() {
+        if (cart.length === 0) {
+          alert('Your cart is empty!');
+          return;
+        }
+
+        const { total } = calculateTotals();
+        const confirmation = confirm(`Proceed to checkout for Rs${total.toFixed(2)}?`);
+        
+        if (confirmation) {
+          alert('Thank you for your order! This is a demo - in a real store, you would be redirected to a payment gateway.');
+          // In a real application, you would redirect to a payment gateway
+          // For demo purposes, we'll clear the cart
+          cart = [];
+          localStorage.setItem('cart', JSON.stringify(cart));
+          displayCart();
+          updateCartIcon();
+        }
+      }
+
+      // Initialize cart display when page loads
+      document.addEventListener('DOMContentLoaded', function() {
+        displayCart();
+      });
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const user = JSON.parse(localStorage.getItem('loggedInUser'));
+        const nav = document.querySelector('.navbar nav ul');
+        if (user) {
+          // Remove Account link
+          const accountLi = Array.from(nav.children).find(li => li.textContent.trim() === 'Account');
+          if (accountLi) accountLi.remove();
+          // Add user and sign out
+          const userLi = document.createElement('li');
+          userLi.innerHTML = `<span style="color:#ff523b;font-weight:600;">${user.username}</span> <button id="signOutBtn" style="margin-left:10px;padding:4px 10px;border:none;background:#ff523b;color:#fff;border-radius:4px;cursor:pointer;">Sign Out</button>`;
+          nav.appendChild(userLi);
+          document.getElementById('signOutBtn').onclick = function() {
+            localStorage.removeItem('loggedInUser');
+            window.location.reload();
+          };
+        }
+      });
     </script>
   </body>
 </html>

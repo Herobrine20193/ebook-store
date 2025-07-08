@@ -15,6 +15,7 @@
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
     />
+    <script src="cart-shared.js"></script>
   </head>
 
   <body>
@@ -66,7 +67,7 @@
           <a href="book-detail.html">
             <img src="images/Book 4.jpg" alt="Book 4" />
           </a>
-          <a href="book-detail.html"> <h4>Anna Karenina</h4> </a>
+          <a href="book-detail.html"> <h4>1984</h4> </a>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -74,11 +75,12 @@
             <i class="fa fa-star"></i>
             <i class="fa fa-star-o"></i>
           </div>
-          <p>Rs.500</p>
+          <p>Rs.550</p>
+          <button class="btn add-to-cart-btn" onclick="addToCart('book4')">Add to Cart</button>
         </div>
         <div class="col-4">
           <img src="images/Book 5.jpg" alt="Book 5" />
-          <h4>Watership Down</h4>
+          <h4>Pride and Prejudice</h4>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -86,11 +88,12 @@
             <i class="fa fa-star-half-o"></i>
             <i class="fa fa-star-o"></i>
           </div>
-          <p>Rs.500</p>
+          <p>Rs.480</p>
+          <button class="btn add-to-cart-btn" onclick="addToCart('book5')">Add to Cart</button>
         </div>
         <div class="col-4">
           <img src="images/Book 6.jpg" alt="Book 6" />
-          <h4>All The Night We Cannot See</h4>
+          <h4>The Catcher in the Rye</h4>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -98,11 +101,12 @@
             <i class="fa fa-star"></i>
             <i class="fa fa-star-half-o"></i>
           </div>
-          <p>Rs.500</p>
+          <p>Rs.420</p>
+          <button class="btn add-to-cart-btn" onclick="addToCart('book6')">Add to Cart</button>
         </div>
         <div class="col-4">
           <img src="images/Book 7.jpg" alt="Book 7" />
-          <h4>The HOBBIT</h4>
+          <h4>Lord of the Flies</h4>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -110,13 +114,14 @@
             <i class="fa fa-star"></i>
             <i class="fa fa-star-o"></i>
           </div>
-          <p>Rs.500</p>
+          <p>Rs.380</p>
+          <button class="btn add-to-cart-btn" onclick="addToCart('book7')">Add to Cart</button>
         </div>
       </div>
       <div class="row">
         <div class="col-4">
           <img src="images/Book 8.jpg" alt="Book 8" />
-          <h4>Anna Karenina</h4>
+          <h4>The Hobbit</h4>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -124,11 +129,12 @@
             <i class="fa fa-star"></i>
             <i class="fa fa-star-o"></i>
           </div>
-          <p>Rs.500</p>
+          <p>Rs.520</p>
+          <button class="btn add-to-cart-btn" onclick="addToCart('book8')">Add to Cart</button>
         </div>
         <div class="col-4">
           <img src="images/Book 9.jpg" alt="Book 9" />
-          <h4>Watership Down</h4>
+          <h4>Fahrenheit 451</h4>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -136,11 +142,12 @@
             <i class="fa fa-star-half-o"></i>
             <i class="fa fa-star-o"></i>
           </div>
-          <p>Rs.500</p>
+          <p>Rs.460</p>
+          <button class="btn add-to-cart-btn" onclick="addToCart('book9')">Add to Cart</button>
         </div>
         <div class="col-4">
           <img src="images/Book 10.jpg" alt="Book 10" />
-          <h4>All The Night We Cannot See</h4>
+          <h4>Jane Eyre</h4>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -148,11 +155,12 @@
             <i class="fa fa-star"></i>
             <i class="fa fa-star-half-o"></i>
           </div>
-          <p>Rs.500</p>
+          <p>Rs.490</p>
+          <button class="btn add-to-cart-btn" onclick="addToCart('book10')">Add to Cart</button>
         </div>
         <div class="col-4">
           <img src="images/Book 11.jpg" alt="Book 11" />
-          <h4>The HOBBIT</h4>
+          <h4>Wuthering Heights</h4>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -160,13 +168,14 @@
             <i class="fa fa-star"></i>
             <i class="fa fa-star-o"></i>
           </div>
-          <p>Rs.500</p>
+          <p>Rs.470</p>
+          <button class="btn add-to-cart-btn" onclick="addToCart('book11')">Add to Cart</button>
         </div>
       </div>
       <div class="row">
         <div class="col-4">
           <img src="images/Book 12.jpg" alt="Book 12" />
-          <h4>Anna Karenina</h4>
+          <h4>The Picture of Dorian Gray</h4>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -174,11 +183,12 @@
             <i class="fa fa-star"></i>
             <i class="fa fa-star-o"></i>
           </div>
-          <p>Rs.500</p>
+          <p>Rs.440</p>
+          <button class="btn add-to-cart-btn" onclick="addToCart('book12')">Add to Cart</button>
         </div>
         <div class="col-4">
           <img src="images/Book 13.jpg" alt="Book 13" />
-          <h4>Watership Down</h4>
+          <h4>Brave New World</h4>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -186,11 +196,12 @@
             <i class="fa fa-star-half-o"></i>
             <i class="fa fa-star-o"></i>
           </div>
-          <p>Rs.500</p>
+          <p>Rs.510</p>
+          <button class="btn add-to-cart-btn" onclick="addToCart('book13')">Add to Cart</button>
         </div>
         <div class="col-4">
           <img src="images/Book 14.jpg" alt="Book 14" />
-          <h4>All The Night We Cannot See</h4>
+          <h4>The Lord of the Rings</h4>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -282,15 +293,26 @@
     </div>
     <!-- ---------Javascript for toggle menu------------- -->
     <script>
-      var MenuItems = document.getElementById("MenuItems");
-      MenuItems.style.maxHeight = "0px";
-      function menutoggle() {
-        if (MenuItems.style.maxHeight == "0px") {
-          MenuItems.style.maxHeight = "200px";
-        } else {
-          MenuItems.style.maxHeight = "0px";
+      // Menu functionality is now handled by cart-shared.js
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const user = JSON.parse(localStorage.getItem('loggedInUser'));
+        const nav = document.querySelector('.navbar nav ul');
+        if (user) {
+          // Remove Account link
+          const accountLi = Array.from(nav.children).find(li => li.textContent.trim() === 'Account');
+          if (accountLi) accountLi.remove();
+          // Add user and sign out
+          const userLi = document.createElement('li');
+          userLi.innerHTML = `<span style="color:#ff523b;font-weight:600;">${user.username}</span> <button id="signOutBtn" style="margin-left:10px;padding:4px 10px;border:none;background:#ff523b;color:#fff;border-radius:4px;cursor:pointer;">Sign Out</button>`;
+          nav.appendChild(userLi);
+          document.getElementById('signOutBtn').onclick = function() {
+            localStorage.removeItem('loggedInUser');
+            window.location.reload();
+          };
         }
-      }
+      });
     </script>
   </body>
 </html>
