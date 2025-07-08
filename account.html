@@ -307,10 +307,8 @@
           } else if (typeof u.isAdmin === 'undefined') {
             u.isAdmin = false; changed = true;
           }
-          // If password is not a string or is too short, hash it (very basic check)
-          if (u.password && u.password.length < 10 && u.password === u.password.replace(/[^0-9]/g, '')) {
-            // Already hashed (number string), skip
-          } else if (u.password && u.password.length < 20) {
+          // Only hash if not already hashed (hash is always a string of digits, possibly negative)
+          if (u.password && !/^[-]?\d+$/.test(u.password)) {
             u.password = hash(u.password);
             changed = true;
           }
