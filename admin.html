@@ -86,18 +86,27 @@
 
     // --- Book Management ---
     function renderBooks(filter='') {
+      // Load books from localStorage, or fallback to cart-shared.js default if empty
       let books = window.searchFilter('books', filter);
+      if (!books.length) {
+        if (window.books) {
+          books = Object.values(window.books);
+        } else if (typeof books === 'undefined' || !books.length) {
+          // fallback: try to load from localStorage key 'books_db' or 'books'
+          books = JSON.parse(localStorage.getItem('books_db') || localStorage.getItem('books') || '[]');
+        }
+      }
       let html = `<div class='admin-title'><b>Books</b></div>`;
       html += `<input id='book-search' placeholder='Search books...' style='margin-bottom:10px;padding:6px;width:220px;'>`;
       html += `<button class='admin-btn' id='bulk-delete-books' style='margin-left:10px;'>Delete Selected</button>`;
       html += `<table class='admin-table'><tr><th><input type='checkbox' id='select-all-books'></th><th>Title</th><th>Author</th><th>Price</th><th>Image</th><th>Action</th></tr>`;
       books.forEach((b,i) => {
-        html += `<tr data-id='${b.id}'>`+
+        html += `<tr data-id='${b.id||b.title||i}'>`+
           `<td><input type='checkbox' class='book-select'></td>`+
-          `<td class='editable' data-field='title'>${b.title}</td>`+
+          `<td class='editable' data-field='title'>${b.title||''}</td>`+
           `<td class='editable' data-field='author'>${b.author||''}</td>`+
-          `<td class='editable' data-field='price'>${b.price}</td>`+
-          `<td><img src='${b.image}' style='max-width:40px;'></td>`+
+          `<td class='editable' data-field='price'>${b.price||''}</td>`+
+          `<td><img src='${b.image||''}' style='max-width:40px;'></td>`+
           `<td><button class='admin-btn edit-book'>Edit</button><button class='admin-btn delete-book'>Delete</button></td></tr>`;
       });
       html += '</table>';
