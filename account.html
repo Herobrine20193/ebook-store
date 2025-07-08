@@ -148,14 +148,26 @@
                   <div id="pw-strength-msg" style="font-size:12px;margin-bottom:8px;color:#888;"></div>
                   <button type="submit" class="btn">Sign Up</button>
                 </form>
-                <script>
-                  document.getElementById('google-login').onclick = function() {
-                    showMessage('Google login demo: Signed in as googleuser@example.com');
-                  };
-                  document.getElementById('fb-login').onclick = function() {
-                    showMessage('Facebook login demo: Signed in as fbuser@example.com');
-                  };
-                </script>
+                <!-- removed social login script -->
+    <script>
+    // SIGN IN
+    signInForm.onsubmit = function(e) {
+      e.preventDefault();
+      const username = signInForm.querySelector('input[name="uname"]').value.trim();
+      const password = signInForm.querySelector('input[type="password"]').value;
+      let users = getUsers();
+      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === hash(password));
+      if (!username || !password) {
+        showMessage('Please enter username and password.', true); return;
+      }
+      if (!user) {
+        showMessage('Invalid username or password.', true); return;
+      }
+      setSession(user);
+      showMessage('Signed in successfully!');
+      setTimeout(function(){ window.location.reload(); }, 700);
+    }
+    </script>
               </div>
             </div>
           </div>
