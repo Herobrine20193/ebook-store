@@ -19,6 +19,8 @@
           <li><a href="index.html">Home</a></li>
           <li><a href="ebooks.html">Ebooks</a></li>
           <li><a href="cart.html">Cart</a></li>
+          <li id="admin-nav-item" style="display:none;"><a href="admin.html">Admin</a></li>
+          <li id="profile-nav-item" style="display:none;"><a href="profile.html">Profile</a></li>
         </ul>
       </nav>
     </div>
@@ -45,6 +47,22 @@
     </div>
   </div>
   <script>
+    // Show/hide nav items based on user session
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        var user = JSON.parse(localStorage.getItem('loggedInUser'));
+        var adminNav = document.getElementById('admin-nav-item');
+        var profileNav = document.getElementById('profile-nav-item');
+        if (user) {
+          if (profileNav) profileNav.style.display = '';
+          if (user.isAdmin && adminNav) adminNav.style.display = '';
+          else if (adminNav) adminNav.style.display = 'none';
+        } else {
+          if (profileNav) profileNav.style.display = 'none';
+          if (adminNav) adminNav.style.display = 'none';
+        }
+      } catch(e) {}
+    });
     // Show profile info
     const user = JSON.parse(localStorage.getItem('loggedInUser'));
     if (!user) { window.location.href = 'account.html'; }

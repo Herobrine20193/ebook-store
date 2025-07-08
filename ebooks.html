@@ -35,7 +35,26 @@
             <li><a href="">About</a></li>
             <li><a href="">Contact</a></li>
             <li><a href="account.html">Account</a></li>
-            <li><a href="admin.html">Admin</a></li>
+            <li id="admin-nav-item" style="display:none;"><a href="admin.html">Admin</a></li>
+            <li id="profile-nav-item" style="display:none;"><a href="profile.html">Profile</a></li>
+    <script>
+      // Show/hide nav items based on user session
+      document.addEventListener('DOMContentLoaded', function() {
+        try {
+          var user = JSON.parse(localStorage.getItem('loggedInUser'));
+          var adminNav = document.getElementById('admin-nav-item');
+          var profileNav = document.getElementById('profile-nav-item');
+          if (user) {
+            if (profileNav) profileNav.style.display = '';
+            if (user.isAdmin && adminNav) adminNav.style.display = '';
+            else if (adminNav) adminNav.style.display = 'none';
+          } else {
+            if (profileNav) profileNav.style.display = 'none';
+            if (adminNav) adminNav.style.display = 'none';
+          }
+        } catch(e) {}
+      });
+    </script>
           </ul>
         </nav>
         <a href="cart.html">
@@ -225,7 +244,7 @@
           <p>Rs.500</p>
         </div>
       </div>
-	  <!-- ---------------------Youtube Video------------------- -->
+    <!-- ---------------------Youtube Video------------------- -->
     <div class="youtube-container">
       <div class="youtube-row">
         <div class="col-2">
@@ -245,7 +264,7 @@
       </div>
     </div>
 
-	  <!-- -->
+    <!-- -->
       <div class="page-btn">
         <span>1</span>
         <span>2</span>

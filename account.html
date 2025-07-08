@@ -34,6 +34,8 @@
             <li><a href="">About</a></li>
             <li><a href="">Contact</a></li>
             <li><a href="account.html">Account</a></li>
+            <li id="admin-nav-item" style="display:none;"><a href="admin.html">Admin</a></li>
+            <li id="profile-nav-item" style="display:none;"><a href="profile.html">Profile</a></li>
           </ul>
         </nav>
         <a href="cart.html">
@@ -123,12 +125,30 @@
     </div>
     <!-- ---------Javascript for toggle menu------------- -->
     <script src="cart-shared.js"></script>
+    <script>
+      // Show/hide nav items based on user session
+      document.addEventListener('DOMContentLoaded', function() {
+        try {
+          var user = JSON.parse(localStorage.getItem('loggedInUser'));
+          var adminNav = document.getElementById('admin-nav-item');
+          var profileNav = document.getElementById('profile-nav-item');
+          if (user) {
+            if (profileNav) profileNav.style.display = '';
+            if (user.isAdmin && adminNav) adminNav.style.display = '';
+            else if (adminNav) adminNav.style.display = 'none';
+          } else {
+            if (profileNav) profileNav.style.display = 'none';
+            if (adminNav) adminNav.style.display = 'none';
+          }
+        } catch(e) {}
+      });
+    </script>
     <script src="admin-shared.js"></script>
     <script>
       // Simple hash function for demo (not secure for real apps)
       function hash(str) {
         let hash = 0, i, chr;
-        if (str.length === 0) return hash;
+        if (!str || typeof str !== 'string') return hash;
         for (i = 0; i < str.length; i++) {
           chr = str.charCodeAt(i);
           hash = ((hash << 5) - hash) + chr;
@@ -144,17 +164,30 @@
       function isStrongPassword(pw) {
         return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(pw);
       }
-      // Show/hide password toggle
+      // Show/hide password toggle, autofocus, and Enter key submit
       document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('input[type="password"]').forEach(function(input) {
           const toggle = document.createElement('span');
           toggle.textContent = '👁️';
+          toggle.title = 'Show/hide password';
           toggle.style.cursor = 'pointer';
           toggle.style.marginLeft = '8px';
           toggle.onclick = function() {
             input.type = input.type === 'password' ? 'text' : 'password';
           };
           input.parentNode.insertBefore(toggle, input.nextSibling);
+        });
+        // Autofocus first input
+        var firstInput = document.querySelector('.form-container input');
+        if (firstInput) firstInput.focus();
+        // Enter key submits form
+        document.querySelectorAll('form').forEach(function(form) {
+          form.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+              var btn = form.querySelector('button[type="submit"]');
+              if (btn) btn.click();
+            }
+          });
         });
       });
       // Session expiry (30 min)
@@ -223,10 +256,10 @@
           showMessage('Password must be at least 6 characters, include a letter and a number.', true); return;
         }
         let users = getUsers();
-        if (users.find(u => u.username === username)) {
+        if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
           showMessage('Username already exists.', true); return;
         }
-        if (users.find(u => u.email === email)) {
+        if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
           showMessage('Email already registered.', true); return;
         }
         // Make the first admin account (admin/admin123) isAdmin by default
@@ -244,7 +277,7 @@
         const username = signInForm.querySelector('input[type="text"]').value.trim();
         const password = signInForm.querySelector('input[type="password"]').value;
         let users = getUsers();
-        const user = users.find(u => u.username === username && u.password === hash(password));
+        const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === hash(password));
         if (user) {
           showMessage('Sign in successful! Welcome, ' + user.username + '.');
           setSession(user);
@@ -297,13 +330,13 @@
       function migrateUsers() {
         let users = getUsers();
         let changed = false;
-        // Remove 'admin' user
+        // Remove 'admin' user (case-insensitive)
         const before = users.length;
-        users = users.filter(u => u.username !== 'admin');
+        users = users.filter(u => u.username.toLowerCase() !== 'admin');
         if (users.length !== before) changed = true;
-        // Set 'ItzmeTejas' as admin
+        // Set 'ItzmeTejas' as admin (case-insensitive)
         users.forEach(u => {
-          if (u.username === 'ItzmeTejas') {
+          if (u.username.toLowerCase() === 'itzmeteja') {
             if (!u.isAdmin) { u.isAdmin = true; changed = true; }
           } else if (typeof u.isAdmin === 'undefined') {
             u.isAdmin = false; changed = true;
