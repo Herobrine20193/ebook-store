@@ -86,15 +86,17 @@
 
     // --- Book Management ---
     function renderBooks(filter='') {
-      // Load books from localStorage, or fallback to cart-shared.js default if empty
-      let books = window.searchFilter('books', filter);
+      // Canonical book list: from localStorage 'books', fallback to window.books (cart-shared.js)
+      let books = [];
+      // 1. Try searchFilter (localStorage 'books')
+      books = window.searchFilter('books', filter);
+      // 2. If still empty, try localStorage 'books' directly
       if (!books.length) {
-        if (window.books) {
-          books = Object.values(window.books);
-        } else if (typeof books === 'undefined' || !books.length) {
-          // fallback: try to load from localStorage key 'books_db' or 'books'
-          books = JSON.parse(localStorage.getItem('books_db') || localStorage.getItem('books') || '[]');
-        }
+        try { books = JSON.parse(localStorage.getItem('books') || '[]'); } catch(e) { books = []; }
+      }
+      // 3. If still empty, fallback to window.books (cart-shared.js)
+      if (!books.length && window.books) {
+        books = Object.values(window.books);
       }
       let html = `<div class='admin-title'><b>Books</b></div>`;
       html += `<input id='book-search' placeholder='Search books...' style='margin-bottom:10px;padding:6px;width:220px;'>`;
