@@ -50,9 +50,11 @@
       </div>
       <div id="admin-section" class="admin-section"></div>
     <div id="admin-dialog" style="display:none;"></div>
+    <script src="admin-shared.js"></script>
     </div>
   </div>
   <script>
+    <script src="admin-shared.js"></script>
     // Only allow admin (isAdmin property)
     let user = JSON.parse(localStorage.getItem('loggedInUser'));
     if (!user || !user.isAdmin) {
