@@ -124,14 +124,58 @@
     <!-- ---------Javascript for toggle menu------------- -->
     <script src="cart-shared.js"></script>
     <script>
-      // Menu toggle is handled by cart-shared.js
+      // Simple hash function for demo (not secure for real apps)
+      function hash(str) {
+        let hash = 0, i, chr;
+        if (str.length === 0) return hash;
+        for (i = 0; i < str.length; i++) {
+          chr = str.charCodeAt(i);
+          hash = ((hash << 5) - hash) + chr;
+          hash |= 0;
+        }
+        return hash.toString();
+      }
+      // Email validation
+      function isValidEmail(email) {
+        return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+      }
+      // Password validation (min 6 chars, 1 number, 1 letter)
+      function isStrongPassword(pw) {
+        return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(pw);
+      }
+      // Show/hide password toggle
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('input[type="password"]').forEach(function(input) {
+          const toggle = document.createElement('span');
+          toggle.textContent = '👁️';
+          toggle.style.cursor = 'pointer';
+          toggle.style.marginLeft = '8px';
+          toggle.onclick = function() {
+            input.type = input.type === 'password' ? 'text' : 'password';
+          };
+          input.parentNode.insertBefore(toggle, input.nextSibling);
+        });
+      });
+      // Session expiry (30 min)
+      function setSession(user) {
+        localStorage.setItem('loggedInUser', JSON.stringify(user));
+        localStorage.setItem('sessionExpiry', Date.now() + 30*60*1000);
+      }
+      function checkSession() {
+        const expiry = localStorage.getItem('sessionExpiry');
+        if (expiry && Date.now() > parseInt(expiry)) {
+          localStorage.removeItem('loggedInUser');
+          localStorage.removeItem('sessionExpiry');
+          window.location.reload();
+        }
+      }
+      setInterval(checkSession, 60*1000);
     </script>
     <!-- -----------js for toggle form------------------ -->
     <script>
       var signInForm = document.getElementById("signInForm");
       var signUpForm = document.getElementById("signUpForm");
       var indicator = document.getElementById("indicator");
-
       function signIn() {
         signUpForm.style.transform = "translateX(300px)";
         signInForm.style.transform = "translateX(300px)";
@@ -145,15 +189,8 @@
     </script>
     <!-- -----------js for sign in/sign up functionality ------------------ -->
     <script>
-      // Helper: get users from localStorage
-      function getUsers() {
-        return JSON.parse(localStorage.getItem('users') || '[]');
-      }
-      // Helper: save users to localStorage
-      function saveUsers(users) {
-        localStorage.setItem('users', JSON.stringify(users));
-      }
-      // Helper: show message
+      function getUsers() { return JSON.parse(localStorage.getItem('users') || '[]'); }
+      function saveUsers(users) { localStorage.setItem('users', JSON.stringify(users)); }
       function showMessage(msg, isError = false) {
         let msgDiv = document.getElementById('account-msg');
         if (!msgDiv) {
@@ -178,6 +215,12 @@
         if (!username || !email || !password) {
           showMessage('Please fill all fields.', true); return;
         }
+        if (!isValidEmail(email)) {
+          showMessage('Invalid email format.', true); return;
+        }
+        if (!isStrongPassword(password)) {
+          showMessage('Password must be at least 6 characters, include a letter and a number.', true); return;
+        }
         let users = getUsers();
         if (users.find(u => u.username === username)) {
           showMessage('Username already exists.', true); return;
@@ -185,7 +228,7 @@
         if (users.find(u => u.email === email)) {
           showMessage('Email already registered.', true); return;
         }
-        users.push({ username, email, password });
+        users.push({ username, email, password: hash(password) });
         saveUsers(users);
         showMessage('Sign up successful! You can now sign in.');
         signIn();
@@ -197,11 +240,10 @@
         const username = signInForm.querySelector('input[type="text"]').value.trim();
         const password = signInForm.querySelector('input[type="password"]').value;
         let users = getUsers();
-        const user = users.find(u => u.username === username && u.password === password);
+        const user = users.find(u => u.username === username && u.password === hash(password));
         if (user) {
           showMessage('Sign in successful! Welcome, ' + user.username + '.');
-          // Save session (for demo, just a flag)
-          localStorage.setItem('loggedInUser', JSON.stringify(user));
+          setSession(user);
           setTimeout(() => { window.location.href = 'index.html'; }, 1200);
         } else {
           showMessage('Invalid username or password.', true);

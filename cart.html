@@ -136,10 +136,34 @@
         localStorage.setItem('cart', JSON.stringify(cart));
       }
 
+      // Require login for checkout, store order history per user, and add empty cart button
+      function getCurrentUser() {
+        return JSON.parse(localStorage.getItem('loggedInUser'));
+      }
+      function getUserCartKey() {
+        const user = getCurrentUser();
+        return user ? 'cart_' + user.username : 'cart_guest';
+      }
+      // Load cart for user
+      function loadCart() {
+        cart = JSON.parse(localStorage.getItem(getUserCartKey()) || '[]');
+      }
+      function saveCart() {
+        localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+      }
+      // Override cart load/save
+      loadCart();
+      // Empty cart button
+      function emptyCart() {
+        cart = [];
+        saveCart();
+        displayCart();
+        updateCartIcon();
+      }
       // Function to remove item from cart
       function removeFromCart(bookId) {
         cart = cart.filter(item => item.id !== bookId);
-        localStorage.setItem('cart', JSON.stringify(cart));
+        saveCart();
         displayCart();
         updateCartIcon();
       }
@@ -152,7 +176,7 @@
             removeFromCart(bookId);
           } else {
             item.quantity = newQuantity;
-            localStorage.setItem('cart', JSON.stringify(cart));
+            saveCart();
             displayCart();
             updateCartIcon();
           }
@@ -227,20 +251,26 @@
 
       // Function to handle checkout
       function checkout() {
+        const user = getCurrentUser();
+        if (!user) {
+          alert('You must be signed in to checkout!');
+          window.location.href = 'account.html';
+          return;
+        }
         if (cart.length === 0) {
           alert('Your cart is empty!');
           return;
         }
-
         const { total } = calculateTotals();
         const confirmation = confirm(`Proceed to checkout for Rs${total.toFixed(2)}?`);
-        
         if (confirmation) {
+          // Save order history
+          let orders = JSON.parse(localStorage.getItem('orders_' + user.username) || '[]');
+          orders.push({ total: total.toFixed(2), date: new Date().toLocaleString(), items: cart });
+          localStorage.setItem('orders_' + user.username, JSON.stringify(orders));
           alert('Thank you for your order! This is a demo - in a real store, you would be redirected to a payment gateway.');
-          // In a real application, you would redirect to a payment gateway
-          // For demo purposes, we'll clear the cart
           cart = [];
-          localStorage.setItem('cart', JSON.stringify(cart));
+          saveCart();
           displayCart();
           updateCartIcon();
         }
@@ -249,6 +279,12 @@
       // Initialize cart display when page loads
       document.addEventListener('DOMContentLoaded', function() {
         displayCart();
+        const btn = document.createElement('button');
+        btn.textContent = 'Empty Cart';
+        btn.className = 'btn';
+        btn.style.marginTop = '10px';
+        btn.onclick = emptyCart;
+        document.querySelector('.checkout-btn').appendChild(btn);
       });
     </script>
     <script>

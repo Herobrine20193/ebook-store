@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel | Ebookstore</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="navbar">
+      <div class="logo">
+        <a href="index.html">
+          <img src="images/EbookStore-Logo.png" alt="EbookStore-Logo" />
+        </a>
+      </div>
+      <nav>
+        <ul id="MenuItems">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="ebooks.html">Ebooks</a></li>
+          <li><a href="cart.html">Cart</a></li>
+          <li><a href="admin.html">Admin</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <div class="account-page">
+    <div class="container">
+      <h2>Admin Panel</h2>
+      <div id="admin-section"></div>
+    </div>
+  </div>
+  <script>
+    // Only allow admin (username: admin, password: admin123)
+    const adminUser = { username: 'admin', password: 'admin123' };
+    let user = JSON.parse(localStorage.getItem('loggedInUser'));
+    if (!user || user.username !== 'admin') {
+      document.getElementById('admin-section').innerHTML = '<p style="color:red;">Access denied. Only admin can view this page.</p>';
+      throw new Error('Not admin');
+    }
+    // Book management
+    let books = JSON.parse(localStorage.getItem('books_db') || '[]');
+    function saveBooks() { localStorage.setItem('books_db', JSON.stringify(books)); }
+    function renderBooks() {
+      let html = '<h3>Books</h3><table border="1" style="width:100%;margin-bottom:20px;"><tr><th>Title</th><th>Price</th><th>Image</th><th>Action</th></tr>';
+      books.forEach((b,i) => {
+        html += `<tr><td>${b.title}</td><td>Rs${b.price}</td><td><img src="${b.image}" width="40"></td><td><button onclick="deleteBook(${i})">Delete</button></td></tr>`;
+      });
+      html += '</table>';
+      html += `<h4>Add Book</h4><form id="addBookForm"><input type="text" id="btitle" placeholder="Title" required><input type="number" id="bprice" placeholder="Price" required><input type="text" id="bimg" placeholder="Image path" required><button type="submit">Add</button></form>`;
+      document.getElementById('admin-section').innerHTML = html + document.getElementById('admin-section').innerHTML;
+      document.getElementById('addBookForm').onsubmit = function(e) {
+        e.preventDefault();
+        books.push({ title: btitle.value, price: bprice.value, image: bimg.value });
+        saveBooks();
+        renderBooks();
+      };
+    }
+    window.deleteBook = function(idx) {
+      books.splice(idx,1);
+      saveBooks();
+      renderBooks();
+    };
+    // User management
+    function renderUsers() {
+      let users = JSON.parse(localStorage.getItem('users')||'[]');
+      let html = '<h3>Users</h3><table border="1" style="width:100%;margin-bottom:20px;"><tr><th>Username</th><th>Email</th><th>Action</th></tr>';
+      users.forEach((u,i) => {
+        html += `<tr><td>${u.username}</td><td>${u.email}</td><td><button onclick="deleteUser(${i})">Delete</button></td></tr>`;
+      });
+      html += '</table>';
+      document.getElementById('admin-section').innerHTML += html;
+    }
+    window.deleteUser = function(idx) {
+      let users = JSON.parse(localStorage.getItem('users')||'[]');
+      users.splice(idx,1);
+      localStorage.setItem('users', JSON.stringify(users));
+      renderAdmin();
+    };
+    // Orders management
+    function renderOrders() {
+      let html = '<h3>Orders</h3>';
+      let users = JSON.parse(localStorage.getItem('users')||'[]');
+      users.forEach(u => {
+        let orders = JSON.parse(localStorage.getItem('orders_'+u.username)||'[]');
+        if (orders.length) {
+          html += `<b>${u.username}</b><ul>`;
+          orders.forEach(o => {
+            html += `<li>Rs${o.total} on ${o.date} (${o.items.length} items)</li>`;
+          });
+          html += '</ul>';
+        }
+      });
+      document.getElementById('admin-section').innerHTML += html;
+    }
+    function renderAdmin() {
+      document.getElementById('admin-section').innerHTML = '';
+      renderBooks();
+      renderUsers();
+      renderOrders();
+    }
+    renderAdmin();
+  </script>
+</body>
+</html>

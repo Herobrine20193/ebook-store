@@ -22,20 +22,32 @@ const books = {
   'book16': { id: 'book16', title: 'War and Peace', price: 700, image: 'images/Book 16.jpg' }
 };
 
+// Make cart user-specific
+function getCurrentUser() {
+  return JSON.parse(localStorage.getItem('loggedInUser'));
+}
+function getUserCartKey() {
+  const user = getCurrentUser();
+  return user ? 'cart_' + user.username : 'cart_guest';
+}
+function loadCart() {
+  cart = JSON.parse(localStorage.getItem(getUserCartKey()) || '[]');
+}
+function saveCart() {
+  localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+}
+loadCart();
+
 // Function to add item to cart
 function addToCart(bookId, quantity = 1) {
   const existingItem = cart.find(item => item.id === bookId);
-  
   if (existingItem) {
     existingItem.quantity += quantity;
   } else {
     cart.push({ id: bookId, quantity: quantity });
   }
-  
-  localStorage.setItem('cart', JSON.stringify(cart));
+  saveCart();
   updateCartIcon();
-  
-  // Show confirmation message
   const book = books[bookId];
   if (book) {
     showNotification(`${book.title} added to cart!`);
@@ -89,9 +101,8 @@ function showNotification(message) {
 
 // Function to update cart icon
 function updateCartIcon() {
+  loadCart();
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  
-  // Check if cart badge exists, if not create it
   let cartBadge = document.querySelector('.cart-badge');
   if (!cartBadge && totalItems > 0) {
     cartBadge = document.createElement('span');
@@ -109,14 +120,12 @@ function updateCartIcon() {
       min-width: 18px;
       text-align: center;
     `;
-    
     const cartLink = document.querySelector('a[href="cart.html"]');
     if (cartLink) {
       cartLink.style.position = 'relative';
       cartLink.appendChild(cartBadge);
     }
   }
-  
   if (cartBadge) {
     if (totalItems > 0) {
       cartBadge.textContent = totalItems;

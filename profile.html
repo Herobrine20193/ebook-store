@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile | Ebookstore</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="navbar">
+      <div class="logo">
+        <a href="index.html">
+          <img src="images/EbookStore-Logo.png" alt="EbookStore-Logo" />
+        </a>
+      </div>
+      <nav>
+        <ul id="MenuItems">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="ebooks.html">Ebooks</a></li>
+          <li><a href="cart.html">Cart</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <div class="account-page">
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <h2>Your Profile</h2>
+          <div id="profile-info"></div>
+          <form id="profileForm" style="margin-top:20px;display:none;">
+            <input type="text" id="profile-username" placeholder="Username" disabled />
+            <input type="email" id="profile-email" placeholder="Email" />
+            <input type="password" id="profile-password" placeholder="New Password (leave blank to keep)" />
+            <button type="submit" class="btn">Update Profile</button>
+          </form>
+          <button id="editProfileBtn" class="btn" style="margin-top:10px;">Edit Profile</button>
+        </div>
+        <div class="col-2">
+          <h2>Order History</h2>
+          <ul id="order-history"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Show profile info
+    const user = JSON.parse(localStorage.getItem('loggedInUser'));
+    if (!user) { window.location.href = 'account.html'; }
+    document.getElementById('profile-info').innerHTML = `<b>Username:</b> ${user.username}<br><b>Email:</b> ${user.email}`;
+    document.getElementById('profile-username').value = user.username;
+    document.getElementById('profile-email').value = user.email;
+    // Edit profile
+    document.getElementById('editProfileBtn').onclick = function() {
+      document.getElementById('profileForm').style.display = 'block';
+      this.style.display = 'none';
+    };
+    document.getElementById('profileForm').onsubmit = function(e) {
+      e.preventDefault();
+      let email = document.getElementById('profile-email').value.trim();
+      let password = document.getElementById('profile-password').value;
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        alert('Invalid email format.'); return;
+      }
+      let users = JSON.parse(localStorage.getItem('users')||'[]');
+      let idx = users.findIndex(u => u.username === user.username);
+      if (idx === -1) return;
+      users[idx].email = email;
+      if (password) users[idx].password = hash(password);
+      localStorage.setItem('users', JSON.stringify(users));
+      user.email = email;
+      localStorage.setItem('loggedInUser', JSON.stringify(user));
+      alert('Profile updated!');
+      window.location.reload();
+    };
+    // Order history
+    const orders = JSON.parse(localStorage.getItem('orders_'+user.username)||'[]');
+    const list = document.getElementById('order-history');
+    if (orders.length === 0) list.innerHTML = '<li>No orders yet.</li>';
+    else orders.forEach(o => {
+      const li = document.createElement('li');
+      li.textContent = `Order: Rs${o.total} on ${o.date}`;
+      list.appendChild(li);
+    });
+    // Simple hash (same as account.html)
+    function hash(str) {
+      let hash = 0, i, chr;
+      if (str.length === 0) return hash;
+      for (i = 0; i < str.length; i++) {
+        chr = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0;
+      }
+      return hash.toString();
+    }
+  </script>
+</body>
+</html>
