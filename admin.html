@@ -81,7 +81,36 @@
       html += `<div><b>Orders:</b> ${a.orderCount}</div>`;
       html += `<div><b>Revenue:</b> Rs${a.revenue}</div>`;
       html += `</div>`;
+      // --- Sales by Month ---
+      const sales = window.getSalesByMonth();
+      html += `<h3 style='margin-top:2em;color:#ff523b;'>Sales by Month</h3>`;
+      html += `<table class='admin-table'><tr><th>Month</th><th>Orders</th><th>Revenue</th></tr>`;
+      sales.forEach(s => {
+        html += `<tr><td>${s.month}</td><td>${s.orders}</td><td>Rs${s.revenue}</td></tr>`;
+      });
+      html += `</table>`;
+      // --- Top Books ---
+      const topBooks = window.getTopBooks();
+      html += `<h3 style='margin-top:2em;color:#ff523b;'>Top Books</h3>`;
+      html += `<table class='admin-table'><tr><th>Title</th><th>Sold</th></tr>`;
+      topBooks.forEach(b => {
+        html += `<tr><td>${b.title}</td><td>${b.sold}</td></tr>`;
+      });
+      html += `</table>`;
+      // --- Active Users ---
+      const activeUsers = window.getActiveUsers();
+      html += `<h3 style='margin-top:2em;color:#ff523b;'>Active Users</h3>`;
+      html += `<table class='admin-table'><tr><th>Username</th><th>Orders</th></tr>`;
+      activeUsers.forEach(u => {
+        html += `<tr><td>${u.username}</td><td>${u.orders}</td></tr>`;
+      });
+      html += `</table>`;
+      // --- CSV Export ---
+      html += `<button class='admin-btn' id='export-csv-btn' style='margin-top:1.5em;'>Export All Data as CSV</button>`;
       document.getElementById('admin-section').innerHTML = html;
+      document.getElementById('export-csv-btn').onclick = function() {
+        window.exportAllDataAsCSV();
+      };
     }
 
     // --- Book Management ---

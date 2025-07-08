@@ -35,8 +35,10 @@
               <li><a href="">About</a></li>
               <li><a href="">Contact</a></li>
               <li><a href="account.html">Account</a></li>
+              <li><a href="faq.html">FAQ</a></li>
               <li id="admin-nav-item" style="display:none;"><a href="admin.html">Admin</a></li>
               <li id="profile-nav-item" style="display:none;"><a href="profile.html">Profile</a></li>
+              <li id="wishlist-nav-item" style="display:none;"><a href="wishlist.html">Wishlist</a></li>
     <script>
       // Show/hide nav items based on user session
       document.addEventListener('DOMContentLoaded', function() {
@@ -44,12 +46,15 @@
           var user = JSON.parse(localStorage.getItem('loggedInUser'));
           var adminNav = document.getElementById('admin-nav-item');
           var profileNav = document.getElementById('profile-nav-item');
+          var wishlistNav = document.getElementById('wishlist-nav-item');
           if (user) {
             if (profileNav) profileNav.style.display = '';
+            if (wishlistNav) wishlistNav.style.display = '';
             if (user.isAdmin && adminNav) adminNav.style.display = '';
             else if (adminNav) adminNav.style.display = 'none';
           } else {
             if (profileNav) profileNav.style.display = 'none';
+            if (wishlistNav) wishlistNav.style.display = 'none';
             if (adminNav) adminNav.style.display = 'none';
           }
         } catch(e) {}
@@ -107,6 +112,7 @@
             <img src="images/Book 4.jpg" alt="Book 4"
           /></a>
           <a href="book-detail.html"> <h4>Anna Karenina</h4></a>
+          <button class="wishlist-btn" data-book-id="4" title="Add to Wishlist"><i class="fa fa-heart-o"></i></button>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -119,6 +125,7 @@
         <div class="col-4">
           <img src="images/Book 5.jpg" alt="Book 5" />
           <h4>Watership Down</h4>
+          <button class="wishlist-btn" data-book-id="5" title="Add to Wishlist"><i class="fa fa-heart-o"></i></button>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -131,6 +138,7 @@
         <div class="col-4">
           <img src="images/Book 6.jpg" alt="Book 6" />
           <h4>All The Night We Cannot See</h4>
+          <button class="wishlist-btn" data-book-id="6" title="Add to Wishlist"><i class="fa fa-heart-o"></i></button>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -143,6 +151,7 @@
         <div class="col-4">
           <img src="images/Book 7.jpg" alt="Book 7" />
           <h4>The HOBBIT</h4>
+          <button class="wishlist-btn" data-book-id="7" title="Add to Wishlist"><i class="fa fa-heart-o"></i></button>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -158,6 +167,7 @@
         <div class="col-4">
           <img src="images/Book 8.jpg" alt="Book 8" />
           <h4>Anna Karenina</h4>
+          <button class="wishlist-btn" data-book-id="8" title="Add to Wishlist"><i class="fa fa-heart-o"></i></button>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -170,6 +180,7 @@
         <div class="col-4">
           <img src="images/Book 9.jpg" alt="Book 9" />
           <h4>Watership Down</h4>
+          <button class="wishlist-btn" data-book-id="9" title="Add to Wishlist"><i class="fa fa-heart-o"></i></button>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -182,6 +193,7 @@
         <div class="col-4">
           <img src="images/Book 10.jpg" alt="Book 10" />
           <h4>All The Night We Cannot See</h4>
+          <button class="wishlist-btn" data-book-id="10" title="Add to Wishlist"><i class="fa fa-heart-o"></i></button>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -194,6 +206,7 @@
         <div class="col-4">
           <img src="images/Book 11.jpg" alt="Book 11" />
           <h4>The HOBBIT</h4>
+          <button class="wishlist-btn" data-book-id="11" title="Add to Wishlist"><i class="fa fa-heart-o"></i></button>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -208,6 +221,7 @@
         <div class="col-4">
           <img src="images/Book 12.jpg" alt="Book 12" />
           <h4>Anna Karenina</h4>
+          <button class="wishlist-btn" data-book-id="12" title="Add to Wishlist"><i class="fa fa-heart-o"></i></button>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -220,6 +234,7 @@
         <div class="col-4">
           <img src="images/Book 13.jpg" alt="Book 13" />
           <h4>Watership Down</h4>
+          <button class="wishlist-btn" data-book-id="13" title="Add to Wishlist"><i class="fa fa-heart-o"></i></button>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -232,6 +247,7 @@
         <div class="col-4">
           <img src="images/Book 14.jpg" alt="Book 14" />
           <h4>All The Night We Cannot See</h4>
+          <button class="wishlist-btn" data-book-id="14" title="Add to Wishlist"><i class="fa fa-heart-o"></i></button>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -244,6 +260,7 @@
         <div class="col-4">
           <img src="images/Book 15.jpg" alt="Book 15" />
           <h4>The HOBBIT</h4>
+          <button class="wishlist-btn" data-book-id="15" title="Add to Wishlist"><i class="fa fa-heart-o"></i></button>
           <div class="rating">
             <i class="fa fa-star"></i>
             <i class="fa fa-star"></i>
@@ -252,6 +269,54 @@
             <i class="fa fa-star-o"></i>
           </div>
           <p>Rs.500</p>
+    // Wishlist/favorites logic
+    document.addEventListener('DOMContentLoaded', function() {
+      function getWishlistKey() {
+        const user = JSON.parse(localStorage.getItem('loggedInUser'));
+        return user ? `wishlist_${user.username}` : 'wishlist_guest';
+      }
+      function getWishlist() {
+        const key = getWishlistKey();
+        try {
+          return JSON.parse(localStorage.getItem(key)) || [];
+        } catch { return []; }
+      }
+      function setWishlist(arr) {
+        const key = getWishlistKey();
+        localStorage.setItem(key, JSON.stringify(arr));
+      }
+      function updateWishlistIcons() {
+        const wishlist = getWishlist();
+        document.querySelectorAll('.wishlist-btn').forEach(btn => {
+          const bookId = btn.getAttribute('data-book-id');
+          const icon = btn.querySelector('i');
+          if (wishlist.includes(bookId)) {
+            icon.classList.remove('fa-heart-o');
+            icon.classList.add('fa-heart');
+            btn.title = 'Remove from Wishlist';
+          } else {
+            icon.classList.remove('fa-heart');
+            icon.classList.add('fa-heart-o');
+            btn.title = 'Add to Wishlist';
+          }
+        });
+      }
+      document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const bookId = btn.getAttribute('data-book-id');
+          let wishlist = getWishlist();
+          if (wishlist.includes(bookId)) {
+            wishlist = wishlist.filter(id => id !== bookId);
+          } else {
+            wishlist.push(bookId);
+          }
+          setWishlist(wishlist);
+          updateWishlistIcons();
+        });
+      });
+      updateWishlistIcons();
+    });
         </div>
       </div>
     </div>
@@ -394,6 +459,38 @@
         <p class="copyright">Copyright 2025 - Readly</p>
       </div>
     </div>
+    <!-- ---------------------newsletter signup------------------- -->
+    <div class="newsletter" style="background:#fff;border-radius:12px;box-shadow:0 2px 12px #0001;padding:2em 1.5em 1.5em 1.5em;max-width:650px;margin:2em auto 2em auto;text-align:center;">
+      <h2 style="color:#ff523b;">Subscribe to our Newsletter</h2>
+      <p style="color:#444;">Get updates on new releases, offers, and more.</p>
+      <form id="newsletter-form" style="display:flex;gap:0.7em;justify-content:center;flex-wrap:wrap;margin-top:1em;">
+        <input type="email" id="newsletter-email" placeholder="Your email" required style="padding:8px 14px;border-radius:4px;border:1px solid #ddd;font-size:1em;min-width:220px;">
+        <button type="submit" class="btn" style="padding:8px 22px;">Subscribe</button>
+      </form>
+      <div id="newsletter-msg" style="margin-top:10px;font-size:1em;"></div>
+    </div>
+    <script>
+      document.getElementById('newsletter-form').onsubmit = function(e) {
+        e.preventDefault();
+        var email = document.getElementById('newsletter-email').value.trim();
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+          document.getElementById('newsletter-msg').textContent = 'Please enter a valid email.';
+          document.getElementById('newsletter-msg').style.color = '#ff523b';
+          return;
+        }
+        var subs = JSON.parse(localStorage.getItem('newsletterSubs')||'[]');
+        if (subs.includes(email)) {
+          document.getElementById('newsletter-msg').textContent = 'You are already subscribed!';
+          document.getElementById('newsletter-msg').style.color = '#ffb300';
+          return;
+        }
+        subs.push(email);
+        localStorage.setItem('newsletterSubs', JSON.stringify(subs));
+        document.getElementById('newsletter-msg').textContent = 'Thank you for subscribing!';
+        document.getElementById('newsletter-msg').style.color = '#72EF57';
+        document.getElementById('newsletter-form').reset();
+      };
+    </script>
     <!-- ---------Javascript for toggle menu------------- -->
     <script>
       var MenuItems = document.getElementById("MenuItems");

@@ -759,3 +759,337 @@ form a {
 }
 
 /* --------------------------The End----------------------- */
+/* Wishlist Page Styles */
+.wishlist-card {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  margin: 1.5em auto;
+  max-width: 600px;
+  padding: 1.2em 1.5em;
+  transition: box-shadow 0.2s;
+}
+.wishlist-card:hover {
+  box-shadow: 0 4px 16px rgba(255,82,59,0.13);
+}
+.wishlist-card .book-cover {
+  width: 90px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-right: 1.5em;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.wishlist-card .book-info {
+  flex: 1;
+}
+.wishlist-card h3 {
+  margin: 0 0 0.3em 0;
+  font-size: 1.2em;
+  color: #222;
+}
+.wishlist-card p {
+  margin: 0 0 0.7em 0;
+  color: #666;
+  font-size: 1em;
+}
+.wishlist-card .remove-wishlist-btn {
+  background: #fff0f0;
+  color: #ff523b;
+  border: 1px solid #ff523b;
+  border-radius: 4px;
+  padding: 6px 16px;
+  margin-right: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.wishlist-card .remove-wishlist-btn:hover {
+  background: #ff523b;
+  color: #fff;
+}
+.wishlist-card .view-details-btn {
+  background: #ff523b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 16px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.wishlist-card .view-details-btn:hover {
+  background: #d63b1c;
+}
+#wishlist-container {
+  margin-top: 2em;
+}
+#empty-wishlist-message {
+  color: #888;
+  font-size: 1.1em;
+  margin-top: 2em;
+}
+/* End Wishlist Styles */
+/* Book Reviews & Ratings Styles */
+#reviews-section {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px #0001;
+  padding: 2em 1.5em 1.5em 1.5em;
+  margin: 2em auto 2em auto;
+  max-width: 650px;
+}
+#reviews-section h2 {
+  color: #ff523b;
+  margin-bottom: 1em;
+}
+#reviews-list .review-item {
+  background: #faf9f9;
+  border-radius: 7px;
+  padding: 1em 1.2em;
+  margin-bottom: 1.2em;
+  box-shadow: 0 1px 4px #0001;
+}
+#review-form-container {
+  margin-top: 2em;
+  background: #f8f8f8;
+  border-radius: 7px;
+  padding: 1.2em 1em 1em 1em;
+  box-shadow: 0 1px 4px #0001;
+}
+#star-rating i {
+  font-size: 1.3em;
+  color: #ff523b;
+  cursor: pointer;
+  margin-right: 2px;
+  transition: color 0.15s;
+}
+#star-rating i.fa-star-o {
+  color: #bbb;
+}
+#review-form textarea {
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  padding: 8px;
+  font-size: 1em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  width: 100%;
+  resize: vertical;
+}
+#review-form .btn {
+  background: #ff523b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 7px 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#review-form .btn:hover {
+  background: #d63b1c;
+}
+#review-message {
+  font-size: 1em;
+}
+/* End Book Reviews Styles */
+/* Book Extra Details Styles */
+#book-extra-details h3 {
+  color: #ff523b;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+}
+#book-extra-details p {
+  color: #444;
+  font-size: 1.05em;
+  margin-bottom: 0.7em;
+}
+#book-extra-details img {
+  border: 2px solid #f3f3f3;
+  transition: box-shadow 0.2s, border 0.2s;
+}
+#book-extra-details img:hover {
+  box-shadow: 0 4px 16px #ff523b22;
+  border: 2px solid #ff523b44;
+}
+/* End Book Extra Details Styles */
+/* Advanced Search/Filter Styles */
+#advanced-filters {
+  margin-bottom: 1.5em;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #0001;
+  padding: 1em 1.5em 1em 1.5em;
+  max-width: 900px;
+}
+#filter-form label {
+  margin-right: 0.4em;
+  color: #222;
+}
+#filter-form select, #filter-form input[type="text"], #filter-form input[type="number"] {
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  padding: 4px 10px;
+  font-size: 1em;
+  margin-right: 0.5em;
+}
+#filter-form select:focus, #filter-form input[type="text"]:focus, #filter-form input[type="number"]:focus {
+  outline: 2px solid #ff523b;
+  border-color: #ff523b;
+}
+#filter-form .btn {
+  background: #ff523b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#filter-form .btn:hover {
+  background: #d63b1c;
+}
+/* End Advanced Search/Filter Styles */
+
+/* ----------------media query for wishlist, reviews, and filter sections---------------- */
+@media (max-width: 700px) {
+  .wishlist-card, #book-extra-details, #reviews-section, #advanced-filters {
+    max-width: 98vw !important;
+    padding: 1em 0.5em 1em 0.5em !important;
+  }
+  .wishlist-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .wishlist-card .book-cover {
+    margin-bottom: 1em;
+    margin-right: 0;
+  }
+  #filter-form {
+    flex-direction: column;
+    gap: 0.7em;
+    align-items: stretch;
+  }
+}
+
+/* Visually Hidden Class for Accessibility */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+/* Admin Analytics Styles */
+.admin-title { font-size: 1.3em; color: #ff523b; margin-bottom: 0.7em; }
+.admin-table { margin-bottom: 1.5em; }
+#export-csv-btn {
+  background: #ff523b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 22px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#export-csv-btn:hover { background: #d63b1c; }
+/* End Admin Analytics Styles */
+
+/* Password Strength Meter & Security Flows */
+#pw-strength { margin-bottom: 8px; }
+#pw-strength-bar { height: 100%; border-radius: 4px; }
+#pw-strength-msg { margin-bottom: 8px; }
+#emailVerifyForm, #twoFAForm {
+  background: #f8f8f8;
+  border-radius: 7px;
+  padding: 1.2em 1em 1em 1em;
+  box-shadow: 0 1px 4px #0001;
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+#emailVerifyForm input, #twoFAForm input {
+  width: 100%;
+  margin-bottom: 0.7em;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 1em;
+}
+#emailVerifyForm .btn, #twoFAForm .btn {
+  background: #ff523b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 7px 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#emailVerifyForm .btn:hover, #twoFAForm .btn:hover {
+  background: #d63b1c;
+}
+#email-verify-msg, #twofa-msg {
+  color: #ff523b;
+}
+
+/* Newsletter Signup Styles */
+.newsletter {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px #0001;
+  padding: 2em 1.5em 1.5em 1.5em;
+  max-width: 650px;
+  margin: 2em auto 2em auto;
+  text-align: center;
+}
+#newsletter-form input[type="email"] {
+  padding: 8px 14px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 1em;
+  min-width: 220px;
+}
+#newsletter-form .btn {
+  background: #ff523b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 22px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#newsletter-form .btn:hover {
+  background: #d63b1c;
+}
+#newsletter-msg {
+  margin-top: 10px;
+  font-size: 1em;
+}
+/* End Newsletter Styles */
+/* FAQ/Help Center Styles */
+.faq-item {
+  margin-bottom: 1.5em;
+  background: #faf9f9;
+  border-radius: 7px;
+  padding: 1.2em 1em;
+  box-shadow: 0 1px 4px #0001;
+}
+.faq-item h3 {
+  color: #ff523b;
+  margin-bottom: 0.4em;
+}
+.faq-item p {
+  color: #444;
+  font-size: 1.05em;
+}
+/* End FAQ Styles */

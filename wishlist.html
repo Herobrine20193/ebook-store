@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Wishlist - Ebook Store</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="ebooks.html">Ebooks</a></li>
+        <li id="profile-nav-item" style="display:none;"><a href="profile.html">Profile</a></li>
+        <li id="wishlist-nav-item" style="display:none;"><a href="wishlist.html">Wishlist</a></li>
+        <li id="logout-nav-item" style="display:none;"><a href="#" id="logout-link">Logout</a></li>
+        <li id="login-nav-item"><a href="account.html">Login</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <h1>My Wishlist</h1>
+    <div id="wishlist-container" class="book-list"></div>
+    <div id="empty-wishlist-message" style="display:none; text-align:center; margin-top:2em;">Your wishlist is empty.</div>
+  </main>
+  <script>
+    // Navigation visibility logic (same as index.html)
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        var user = JSON.parse(localStorage.getItem('loggedInUser'));
+        var profileNav = document.getElementById('profile-nav-item');
+        var wishlistNav = document.getElementById('wishlist-nav-item');
+        var logoutNav = document.getElementById('logout-nav-item');
+        var loginNav = document.getElementById('login-nav-item');
+        if (user) {
+          if (profileNav) profileNav.style.display = '';
+          if (wishlistNav) wishlistNav.style.display = '';
+          if (logoutNav) logoutNav.style.display = '';
+          if (loginNav) loginNav.style.display = 'none';
+        } else {
+          if (profileNav) profileNav.style.display = 'none';
+          if (wishlistNav) wishlistNav.style.display = 'none';
+          if (logoutNav) logoutNav.style.display = 'none';
+          if (loginNav) loginNav.style.display = '';
+        }
+      } catch(e) {}
+    });
+
+    // Logout logic
+    document.getElementById('logout-link')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      localStorage.removeItem('loggedInUser');
+      window.location.href = 'index.html';
+    });
+
+    // Wishlist rendering logic
+    function getWishlist() {
+      var user = JSON.parse(localStorage.getItem('loggedInUser'));
+      if (!user) return [];
+      var wishlistKey = 'wishlist_' + user.username;
+      return JSON.parse(localStorage.getItem(wishlistKey)) || [];
+    }
+
+    function getBooks() {
+      return JSON.parse(localStorage.getItem('books')) || [];
+    }
+
+    function renderWishlist() {
+      var wishlist = getWishlist();
+      var books = getBooks();
+      var container = document.getElementById('wishlist-container');
+      var emptyMsg = document.getElementById('empty-wishlist-message');
+      container.innerHTML = '';
+      if (!wishlist.length) {
+        emptyMsg.style.display = '';
+        return;
+      } else {
+        emptyMsg.style.display = 'none';
+      }
+      wishlist.forEach(function(bookId) {
+        var book = books.find(function(b) { return b.id === bookId; });
+        if (!book) return;
+        var card = document.createElement('div');
+        card.className = 'book-card wishlist-card';
+        card.innerHTML = `
+          <img src="${book.cover || 'images/Book 1.jpg'}" alt="${book.title}" class="book-cover">
+          <div class="book-info">
+            <h3>${book.title}</h3>
+            <p>by ${book.author}</p>
+            <button class="remove-wishlist-btn" data-id="${book.id}">Remove</button>
+            <a href="book-detail.html?id=${book.id}" class="view-details-btn">View Details</a>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      // Remove button logic
+      document.querySelectorAll('.remove-wishlist-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          removeFromWishlist(this.getAttribute('data-id'));
+        });
+      });
+    }
+
+    function removeFromWishlist(bookId) {
+      var user = JSON.parse(localStorage.getItem('loggedInUser'));
+      if (!user) return;
+      var wishlistKey = 'wishlist_' + user.username;
+      var wishlist = JSON.parse(localStorage.getItem(wishlistKey)) || [];
+      var idx = wishlist.indexOf(bookId);
+      if (idx !== -1) {
+        wishlist.splice(idx, 1);
+        localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+        renderWishlist();
+      }
+    }
+
+    // On page load
+    document.addEventListener('DOMContentLoaded', function() {
+      renderWishlist();
+    });
+  </script>
+</body>
+</html>

@@ -98,9 +98,29 @@
     if (orders.length === 0) list.innerHTML = '<li>No orders yet.</li>';
     else orders.forEach(o => {
       const li = document.createElement('li');
-      li.textContent = `Order: Rs${o.total} on ${o.date}`;
+      li.innerHTML = `<b>Order:</b> Rs${o.total} on ${o.date}<br>`;
+      if (o.items && o.items.length) {
+        li.innerHTML += '<ul style="margin:8px 0 0 0;">' +
+          o.items.map(item => {
+            // Try to get book title from global books or fallback to id
+            let title = (window.books && window.books[item.id] && window.books[item.id].title) ? window.books[item.id].title : item.id;
+            return `<li>${title} <button class='btn btn-download' style='padding:2px 12px;font-size:13px;margin-left:8px;' onclick='downloadEbook("${item.id}", "${title}")'>Download</button></li>`;
+          }).join('') + '</ul>';
+      }
       list.appendChild(li);
     });
+    // Download simulation
+    window.downloadEbook = function(bookId, title) {
+      // For demo: create a dummy text file and trigger download
+      const blob = new Blob([
+        `Thank you for purchasing ${title}!\n\nThis is a demo ebook file for ${title}.\nEnjoy reading!`], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${title.replace(/[^a-z0-9]/gi,'_')}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(()=>{ document.body.removeChild(a); }, 100);
+    };
     // Simple hash (same as account.html)
     function hash(str) {
       let hash = 0, i, chr;

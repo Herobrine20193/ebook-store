@@ -77,7 +77,131 @@
         </div>
       </div>
     </div>
-
+    <!-- ----------- Book Extra Details ----------- -->
+    <div class="small-container" id="book-extra-details" style="max-width:650px;margin:2em auto 2em auto;background:#fff;border-radius:12px;box-shadow:0 2px 12px #0001;padding:1.5em 1.5em 1em 1.5em;">
+      <h3>About the Author</h3>
+      <p><b>Leo Tolstoy</b> (1828–1910) was a Russian novelist, essayist, and philosopher, best known for his masterpieces <i>War and Peace</i> and <i>Anna Karenina</i>. His works explore themes of morality, faith, and the human condition, and he is regarded as one of the greatest authors of all time.</p>
+      <h3>Full Description</h3>
+      <p>Anna Karenina is a story of love, betrayal, and the search for meaning in a rapidly changing world. Set against the backdrop of 19th-century Russian society, the novel delves into the complexities of marriage, family, and social expectations. Tolstoy's vivid characters and profound insights make this a timeless classic.</p>
+      <h3>Sample Pages</h3>
+      <div style="display:flex;gap:1.5em;flex-wrap:wrap;">
+        <img src="images/Book 4.jpg" alt="Sample Page 1" style="width:110px;height:150px;object-fit:cover;border-radius:6px;box-shadow:0 1px 4px #0001;">
+        <img src="images/Book 16.jpg" alt="Sample Page 2" style="width:110px;height:150px;object-fit:cover;border-radius:6px;box-shadow:0 1px 4px #0001;">
+      </div>
+    </div>
+    <!-- ----------- Book Reviews & Ratings ----------- -->
+    <div class="small-container" id="reviews-section">
+      <h2>Reviews & Ratings</h2>
+      <div id="reviews-list"></div>
+      <div id="review-form-container">
+        <h3>Leave a Review</h3>
+        <form id="review-form">
+          <label for="review-rating">Rating:</label>
+          <span id="star-rating">
+            <i class="fa fa-star-o" data-value="1"></i>
+            <i class="fa fa-star-o" data-value="2"></i>
+            <i class="fa fa-star-o" data-value="3"></i>
+            <i class="fa fa-star-o" data-value="4"></i>
+            <i class="fa fa-star-o" data-value="5"></i>
+          </span>
+          <input type="hidden" id="review-rating" name="rating" value="0">
+          <br>
+          <label for="review-text">Review:</label><br>
+          <textarea id="review-text" name="review" rows="3" style="width:100%;max-width:500px;"></textarea><br>
+          <button type="submit" class="btn" style="margin-top:10px;">Submit Review</button>
+        </form>
+        <div id="review-message" style="color:#ff523b;margin-top:8px;"></div>
+      </div>
+    </div>
+    <script>
+      // --- Review/rating logic ---
+      function getBookId() {
+        // Try to get ?id= from URL, fallback to 4 (Anna Karenina demo)
+        const params = new URLSearchParams(window.location.search);
+        return params.get('id') || '4';
+      }
+      function getReviews() {
+        const key = 'reviews_' + getBookId();
+        return JSON.parse(localStorage.getItem(key)) || [];
+      }
+      function saveReview(review) {
+        const key = 'reviews_' + getBookId();
+        const reviews = getReviews();
+        reviews.unshift(review);
+        localStorage.setItem(key, JSON.stringify(reviews));
+      }
+      function renderReviews() {
+        const reviews = getReviews();
+        const list = document.getElementById('reviews-list');
+        if (!reviews.length) {
+          list.innerHTML = '<p style="color:#888;">No reviews yet. Be the first to review this book!</p>';
+          return;
+        }
+        list.innerHTML = reviews.map(r => `
+          <div class="review-item" style="margin-bottom:1.2em;padding-bottom:1em;border-bottom:1px solid #eee;">
+            <div style="font-size:1.1em;font-weight:500;color:#222;">${r.username || 'Anonymous'}</div>
+            <div style="color:#ff523b;font-size:1.1em;">
+              ${'<i class="fa fa-star"></i>'.repeat(r.rating)}${'<i class="fa fa-star-o"></i>'.repeat(5-r.rating)}
+            </div>
+            <div style="margin:0.5em 0 0.2em 0;">${r.text.replace(/</g,'&lt;')}</div>
+            <div style="color:#aaa;font-size:0.95em;">${r.date}</div>
+          </div>
+        `).join('');
+      }
+      document.addEventListener('DOMContentLoaded', function() {
+        renderReviews();
+        // Star rating UI
+        const stars = document.querySelectorAll('#star-rating i');
+        let currentRating = 0;
+        stars.forEach(star => {
+          star.addEventListener('mouseenter', function() {
+            const val = parseInt(this.getAttribute('data-value'));
+            stars.forEach((s,i) => {
+              s.className = i < val ? 'fa fa-star' : 'fa fa-star-o';
+            });
+          });
+          star.addEventListener('mouseleave', function() {
+            stars.forEach((s,i) => {
+              s.className = i < currentRating ? 'fa fa-star' : 'fa fa-star-o';
+            });
+          });
+          star.addEventListener('click', function() {
+            currentRating = parseInt(this.getAttribute('data-value'));
+            document.getElementById('review-rating').value = currentRating;
+            stars.forEach((s,i) => {
+              s.className = i < currentRating ? 'fa fa-star' : 'fa fa-star-o';
+            });
+          });
+        });
+        // Review form submit
+        document.getElementById('review-form').addEventListener('submit', function(e) {
+          e.preventDefault();
+          const rating = parseInt(document.getElementById('review-rating').value);
+          const text = document.getElementById('review-text').value.trim();
+          const user = JSON.parse(localStorage.getItem('loggedInUser'));
+          if (!rating) {
+            document.getElementById('review-message').textContent = 'Please select a rating.';
+            return;
+          }
+          if (!text) {
+            document.getElementById('review-message').textContent = 'Please enter your review.';
+            return;
+          }
+          const review = {
+            username: user ? user.username : 'Anonymous',
+            rating,
+            text,
+            date: new Date().toLocaleString()
+          };
+          saveReview(review);
+          document.getElementById('review-form').reset();
+          currentRating = 0;
+          stars.forEach(s => s.className = 'fa fa-star-o');
+          document.getElementById('review-message').textContent = 'Thank you for your review!';
+          renderReviews();
+        });
+      });
+    </script>
     <!-- -------------title----------------- -->
     <div class="small-container">
       <div class="row row-2">
@@ -87,57 +211,37 @@
     </div>
     <!-- --------------Product-------------- -->
     <div class="small-container">
-      <div class="row">
-        <div class="col-4">
-          <img src="images/Book 4.jpg" alt="Book 4" />
-          <h4>Anna Karenina</h4>
-          <div class="rating">
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star-o"></i>
-          </div>
-          <p>Rs.500</p>
-        </div>
-        <div class="col-4">
-          <img src="images/Book 5.jpg" alt="Book 5" />
-          <h4>Watership Down</h4>
-          <div class="rating">
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star-half-o"></i>
-            <i class="fa fa-star-o"></i>
-          </div>
-          <p>Rs.500</p>
-        </div>
-        <div class="col-4">
-          <img src="images/Book 6.jpg" alt="Book 6" />
-          <h4>All The Night We Cannot See</h4>
-          <div class="rating">
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star-half-o"></i>
-          </div>
-          <p>Rs.500</p>
-        </div>
-        <div class="col-4">
-          <img src="images/Book 7.jpg" alt="Book 7" />
-          <h4>The HOBBIT</h4>
-          <div class="rating">
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star"></i>
-            <i class="fa fa-star-o"></i>
-          </div>
-          <p>Rs.500</p>
-        </div>
+      <div class="row" id="related-books-row">
+        <!-- Related books will be rendered here -->
       </div>
     </div>
+    <script>
+      // Related books logic (demo)
+      document.addEventListener('DOMContentLoaded', function() {
+        var related = [
+          {id:'5',title:'Watership Down',cover:'images/Book 5.jpg'},
+          {id:'6',title:'All The Night We Cannot See',cover:'images/Book 6.jpg'},
+          {id:'7',title:'The HOBBIT',cover:'images/Book 7.jpg'}
+        ];
+        var row = document.getElementById('related-books-row');
+        if (row) {
+          row.innerHTML = related.map(b => `
+            <div class='col-4'>
+              <a href='book-detail.html?id=${b.id}'><img src='${b.cover}' alt='${b.title}' /></a>
+              <a href='book-detail.html?id=${b.id}'><h4>${b.title}</h4></a>
+              <div class='rating'>
+                <i class='fa fa-star'></i>
+                <i class='fa fa-star'></i>
+                <i class='fa fa-star'></i>
+                <i class='fa fa-star-half-o'></i>
+                <i class='fa fa-star-o'></i>
+              </div>
+              <p>Rs.500</p>
+            </div>
+          `).join('');
+        }
+      });
+    </script>
     <!-- ---------------------footer------------------- -->
     <div class="footer">
       <div class="container">

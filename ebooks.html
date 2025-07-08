@@ -73,17 +73,44 @@
     <div class="small-container">
       <div class="row row-2">
         <h2>All Ebooks</h2>
-        <select>
+        <label for="sort-select" style="font-weight:500;margin-right:0.5em;">Sort by:</label>
+        <select id="sort-select">
           <option value="default">Default sorting</option>
           <option value="price">Sort by price</option>
           <option value="title">Sort by title</option>
           <option value="rating">Sort by rating</option>
         </select>
       </div>
+      <!-- Advanced Search/Filter -->
+      <div id="advanced-filters" style="background:#fff;padding:1em 1.5em 1em 1.5em;border-radius:10px;box-shadow:0 2px 8px #0001;margin-bottom:1.5em;max-width:900px;">
+        <form id="filter-form" aria-label="Filter books" style="display:flex;flex-wrap:wrap;gap:1.2em;align-items:center;">
+          <div>
+            <label for="filter-genre" style="font-weight:500;">Genre:</label>
+            <select id="filter-genre" name="genre">
+              <option value="">All</option>
+              <option value="Classic">Classic</option>
+              <option value="Fantasy">Fantasy</option>
+              <option value="Dystopian">Dystopian</option>
+              <option value="Romance">Romance</option>
+              <option value="Sci-Fi">Sci-Fi</option>
+            </select>
+          </div>
+          <div>
+            <label for="filter-author" style="font-weight:500;">Author:</label>
+            <input type="text" id="filter-author" name="author" placeholder="Any author" style="border-radius:4px;border:1px solid #ddd;padding:4px 10px;">
+          </div>
+          <div>
+            <label for="filter-price" style="font-weight:500;">Price:</label>
+            <input type="number" id="filter-price-min" name="price-min" placeholder="Min" style="width:60px;border-radius:4px;border:1px solid #ddd;padding:4px 6px;"> -
+            <input type="number" id="filter-price-max" name="price-max" placeholder="Max" style="width:60px;border-radius:4px;border:1px solid #ddd;padding:4px 6px;">
+          </div>
+          <button type="submit" class="btn" style="padding:6px 18px;">Apply Filters</button>
+        </form>
+      </div>
 
       <div class="row">
         <!-- BOOKS GRID RENDERED BY JS -->
-        <div id="books-grid"></div>
+        <div id="books-grid" role="list" aria-label="Book List"></div>
         <script>
         // --- Dynamic Book Grid and Sorting ---
         document.addEventListener('DOMContentLoaded', function() {
@@ -96,15 +123,26 @@
           if (!bookList.length && window.books) {
             bookList = Object.values(window.books);
           }
+          // Add demo genres/authors if missing
+          bookList.forEach(b => {
+            if (!b.genre) b.genre = (b.title||'').toLowerCase().includes('hobbit')||b.title?.toLowerCase().includes('rings') ? 'Fantasy' : (b.title||'').toLowerCase().includes('brave')||b.title?.toLowerCase().includes('fahrenheit') ? 'Dystopian' : 'Classic';
+            if (!b.author) b.author = 'Various';
+          });
           const grid = document.getElementById('books-grid');
-          const select = document.querySelector('.row-2 select');
-          function renderBooks(sortBy) {
+          const select = document.getElementById('sort-select');
+          // Filtering logic
+          function renderBooks(sortBy, filters={}) {
             let books = [...bookList];
+            // Apply filters
+            if (filters.genre) books = books.filter(b => b.genre === filters.genre);
+            if (filters.author) books = books.filter(b => b.author && b.author.toLowerCase().includes(filters.author.toLowerCase()));
+            if (filters.priceMin) books = books.filter(b => Number(b.price) >= filters.priceMin);
+            if (filters.priceMax) books = books.filter(b => Number(b.price) <= filters.priceMax);
             if (sortBy === 'price') books.sort((a,b)=>Number(a.price)-Number(b.price));
             else if (sortBy === 'title') books.sort((a,b)=>String(a.title).localeCompare(String(b.title)));
             // else default order
             grid.innerHTML = books.map(b => `
-              <div class="col-4">
+              <div class="col-4" role="listitem">
                 <img src="${b.image}" alt="${b.title}" />
                 <h4>${b.title}</h4>
                 <div class="rating">
@@ -115,8 +153,20 @@
               </div>
             `).join('');
           }
-          renderBooks('default');
-          select.onchange = function() { renderBooks(this.value); };
+          let currentSort = 'default';
+          let currentFilters = {};
+          renderBooks(currentSort, currentFilters);
+          select.onchange = function() { currentSort = this.value; renderBooks(currentSort, currentFilters); };
+          document.getElementById('filter-form').onsubmit = function(e) {
+            e.preventDefault();
+            currentFilters = {
+              genre: document.getElementById('filter-genre').value,
+              author: document.getElementById('filter-author').value.trim(),
+              priceMin: document.getElementById('filter-price-min').value ? Number(document.getElementById('filter-price-min').value) : undefined,
+              priceMax: document.getElementById('filter-price-max').value ? Number(document.getElementById('filter-price-max').value) : undefined
+            };
+            renderBooks(currentSort, currentFilters);
+          };
         });
         </script>
       </div>

@@ -288,7 +288,12 @@
           let orders = JSON.parse(localStorage.getItem('orders_' + user.username) || '[]');
           orders.push({ total: total.toFixed(2), date: new Date().toLocaleString(), items: cart });
           localStorage.setItem('orders_' + user.username, JSON.stringify(orders));
-          alert('Thank you for your order! This is a demo - in a real store, you would be redirected to a payment gateway.');
+          // Simulate sending ebook via email
+          let email = user.email || '(no email)';
+          let bookTitles = cart.map(item => books[item.id]?.title || item.id).join(', ');
+          setTimeout(()=>{
+            alert('Thank you for your order!\n\nEbooks sent to: ' + email + '\n\nTitles: ' + bookTitles + '\n\n(This is a demo. In a real store, you would receive an email with download links.)');
+          }, 400);
           cart = [];
           saveCart();
           displayCart();

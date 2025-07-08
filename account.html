@@ -70,15 +70,109 @@
                   <span id="uname"></span>
                   <input type="password" placeholder="Password" />
                   <button type="submit" class="btn">Sign In</button>
-                  <a href="">Forgot password</a>
+                  <a href="#" id="forgotPwLink">Forgot password?</a>
+    <!-- Forgot Password Modal -->
+    <div id="forgotPwModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0008;z-index:9999;align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:32px 24px;border-radius:10px;max-width:350px;margin:auto;box-shadow:0 2px 16px #0003;">
+        <h3 style="margin-bottom:10px;">Reset Password</h3>
+        <div id="forgotPwStep1">
+          <input id="fpw-email" type="email" placeholder="Enter your email" style="width:100%;padding:8px;margin-bottom:10px;" />
+          <button id="fpw-send" class="btn" style="width:100%;">Send Reset Code</button>
+        </div>
+        <div id="forgotPwStep2" style="display:none;">
+          <input id="fpw-code" type="text" placeholder="Enter code" style="width:100%;padding:8px;margin-bottom:10px;" />
+          <input id="fpw-newpw" type="password" placeholder="New password" style="width:100%;padding:8px;margin-bottom:10px;" />
+          <button id="fpw-reset" class="btn" style="width:100%;">Reset Password</button>
+        </div>
+        <div id="fpw-msg" style="margin-top:10px;color:#ff523b;"></div>
+        <button id="fpw-close" style="margin-top:16px;background:none;border:none;color:#888;cursor:pointer;width:100%;">Cancel</button>
+      </div>
+    </div>
+    <script>
+    // --- Forgot Password Modal Logic ---
+    document.addEventListener('DOMContentLoaded', function() {
+      var forgotLink = document.getElementById('forgotPwLink');
+      var modal = document.getElementById('forgotPwModal');
+      var closeBtn = document.getElementById('fpw-close');
+      var step1 = document.getElementById('forgotPwStep1');
+      var step2 = document.getElementById('forgotPwStep2');
+      var msg = document.getElementById('fpw-msg');
+      var code = '';
+      var email = '';
+      forgotLink.onclick = function(e) {
+        e.preventDefault();
+        modal.style.display = 'flex';
+        step1.style.display = '';
+        step2.style.display = 'none';
+        msg.textContent = '';
+        document.getElementById('fpw-email').value = '';
+      };
+      closeBtn.onclick = function() { modal.style.display = 'none'; };
+      document.getElementById('fpw-send').onclick = function() {
+        email = document.getElementById('fpw-email').value.trim().toLowerCase();
+        if (!email) { msg.textContent = 'Enter your email.'; return; }
+        var users = JSON.parse(localStorage.getItem('users')||'[]');
+        var user = users.find(u => u.email && u.email.toLowerCase() === email);
+        if (!user) { msg.textContent = 'No account with that email.'; return; }
+        code = Math.floor(100000 + Math.random()*900000).toString();
+        localStorage.setItem('resetCode_'+email, code);
+        msg.style.color = '#72EF57';
+        msg.textContent = 'Reset code sent! (Demo: ' + code + ')';
+        step1.style.display = 'none';
+        step2.style.display = '';
+      };
+      document.getElementById('fpw-reset').onclick = function() {
+        var inputCode = document.getElementById('fpw-code').value.trim();
+        var newpw = document.getElementById('fpw-newpw').value;
+        if (!inputCode || !newpw) { msg.textContent = 'Fill all fields.'; msg.style.color = '#ff523b'; return; }
+        var realCode = localStorage.getItem('resetCode_'+email);
+        if (inputCode !== realCode) { msg.textContent = 'Invalid code.'; msg.style.color = '#ff523b'; return; }
+        if (!isStrongPassword(newpw)) { msg.textContent = 'Password must be at least 6 characters, include a letter and a number.'; msg.style.color = '#ff523b'; return; }
+        var users = JSON.parse(localStorage.getItem('users')||'[]');
+        var user = users.find(u => u.email && u.email.toLowerCase() === email);
+        if (!user) { msg.textContent = 'User not found.'; return; }
+        user.password = hash(newpw);
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.removeItem('resetCode_'+email);
+        msg.textContent = 'Password reset! You can now sign in.';
+        msg.style.color = '#72EF57';
+        setTimeout(()=>{ modal.style.display = 'none'; }, 1200);
+      };
+    });
+    </script>
                 </form>
 
                 <form id="signUpForm">
                   <input type="text" placeholder="Username" />
                   <input type="email" placeholder="Email" />
-                  <input type="password" placeholder="Password" />
+                  <input type="password" placeholder="Password" id="signup-password" />
+                  <div id="pw-strength" style="height:8px;width:100%;background:#eee;border-radius:4px;margin-bottom:8px;overflow:hidden;"><div id="pw-strength-bar" style="height:100%;width:0;background:#ff523b;transition:width 0.2s;"></div></div>
+                  <div id="pw-strength-msg" style="font-size:12px;margin-bottom:8px;color:#888;"></div>
                   <button type="submit" class="btn">Sign Up</button>
                 </form>
+                <form id="emailVerifyForm" style="display:none;">
+                  <input type="text" placeholder="Enter verification code" id="email-verify-code" />
+                  <button type="submit" class="btn">Verify Email</button>
+                  <div id="email-verify-msg" style="font-size:13px;margin-top:8px;"></div>
+                </form>
+                <form id="twoFAForm" style="display:none;">
+                  <input type="text" placeholder="Enter 2FA code" id="twofa-code" />
+                  <button type="submit" class="btn">Verify 2FA</button>
+                  <div id="twofa-msg" style="font-size:13px;margin-top:8px;"></div>
+                </form>
+                <div style="text-align:center;margin:18px 0 10px 0;color:#888;font-size:15px;">or sign in with</div>
+                <div style="display:flex;gap:1em;justify-content:center;margin-bottom:18px;">
+                  <button type="button" class="btn social-btn" id="google-login" style="background:#fff;color:#222;border:1px solid #ddd;"><img src="images/google.png" alt="Google" style="width:20px;vertical-align:middle;margin-right:6px;">Google</button>
+                  <button type="button" class="btn social-btn" id="fb-login" style="background:#fff;color:#222;border:1px solid #ddd;"><img src="images/facebook.png" alt="Facebook" style="width:20px;vertical-align:middle;margin-right:6px;">Facebook</button>
+                </div>
+                <script>
+                  document.getElementById('google-login').onclick = function() {
+                    showMessage('Google login demo: Signed in as googleuser@example.com');
+                  };
+                  document.getElementById('fb-login').onclick = function() {
+                    showMessage('Facebook login demo: Signed in as fbuser@example.com');
+                  };
+                </script>
               </div>
             </div>
           </div>
@@ -262,30 +356,44 @@
         if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
           showMessage('Email already registered.', true); return;
         }
-        // Make the first admin account (admin/admin123) isAdmin by default
-        let isAdmin = false;
-        if (username === 'admin' && password === 'admin123') isAdmin = true;
-        users.push({ username, email, password: hash(password), isAdmin });
-        saveUsers(users);
-        showMessage('Sign up successful! You can now sign in.');
-        signIn();
-        signUpForm.reset();
-      };
-      // SIGN IN
-      signInForm.onsubmit = function(e) {
-        e.preventDefault();
-        const username = signInForm.querySelector('input[type="text"]').value.trim();
-        const password = signInForm.querySelector('input[type="password"]').value;
-        let users = getUsers();
-        const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === hash(password));
-        if (user) {
-          showMessage('Sign in successful! Welcome, ' + user.username + '.');
-          setSession(user);
-          setTimeout(() => { window.location.href = 'index.html'; }, 1200);
-        } else {
-          showMessage('Invalid username or password.', true);
-        }
-      };
+        // Email verification step
+        verificationCode = Math.floor(100000 + Math.random()*900000).toString();
+        localStorage.setItem('emailVerify_'+email, verificationCode);
+        signUpForm.style.display = 'none';
+        emailVerifyForm.style.display = '';
+        verifyMsg.textContent = 'Verification code sent! (Demo: ' + verificationCode + ')';
+        emailVerifyForm.onsubmit = function(ev) {
+            ev.preventDefault();
+            const code = document.getElementById('email-verify-code').value.trim();
+            if (code !== verificationCode) {
+              verifyMsg.textContent = 'Incorrect code.';
+              return;
+            }
+            // 2FA step
+            twoFACode = Math.floor(100000 + Math.random()*900000).toString();
+            localStorage.setItem('twoFA_'+email, twoFACode);
+            emailVerifyForm.style.display = 'none';
+            twoFAForm.style.display = '';
+            twofaMsg.textContent = '2FA code sent! (Demo: ' + twoFACode + ')';
+            twoFAForm.onsubmit = function(e2) {
+              e2.preventDefault();
+              const code2 = document.getElementById('twofa-code').value.trim();
+              if (code2 !== twoFACode) {
+                twofaMsg.textContent = 'Incorrect 2FA code.';
+                return;
+              }
+              // Save user
+              let isAdmin = false;
+              if (username === 'admin' && password === 'admin123') isAdmin = true;
+              users.push({ username, email, password: hash(password), isAdmin });
+              saveUsers(users);
+              showMessage('Sign up successful! You can now sign in.');
+              signIn();
+              signUpForm.reset();
+              twoFAForm.style.display = 'none';
+            };
+          };
+        };
     </script>
     <!-- -----------------js for form validation ------------------ -->
     <script>
@@ -442,6 +550,99 @@
       window.isMobile = function() {
         return window.innerWidth < 700;
       };
+    </script>
+    <script>
+    // --- Password Strength Meter ---
+    document.addEventListener('DOMContentLoaded', function() {
+      var pwInput = document.getElementById('signup-password');
+      var bar = document.getElementById('pw-strength-bar');
+      var msg = document.getElementById('pw-strength-msg');
+      if (pwInput) {
+        pwInput.addEventListener('input', function() {
+          var val = pwInput.value;
+          var score = 0;
+          if (val.length >= 6) score++;
+          if (/[A-Z]/.test(val)) score++;
+          if (/[a-z]/.test(val)) score++;
+          if (/\d/.test(val)) score++;
+          if (/[^A-Za-z0-9]/.test(val)) score++;
+          bar.style.width = (score*20) + '%';
+          bar.style.background = score < 3 ? '#ff523b' : score < 4 ? '#ffb300' : '#72EF57';
+          msg.textContent = score < 3 ? 'Weak' : score < 4 ? 'Medium' : 'Strong';
+        });
+      }
+    });
+    // --- Email Verification & 2FA Demo ---
+    document.addEventListener('DOMContentLoaded', function() {
+      var signUpForm = document.getElementById('signUpForm');
+      var emailVerifyForm = document.getElementById('emailVerifyForm');
+      var twoFAForm = document.getElementById('twoFAForm');
+      var verifyMsg = document.getElementById('email-verify-msg');
+      var twofaMsg = document.getElementById('twofa-msg');
+      var verificationCode = '';
+      var twoFACode = '';
+      if (signUpForm) {
+        signUpForm.onsubmit = function(e) {
+          e.preventDefault();
+          const username = signUpForm.querySelector('input[type="text"]').value.trim();
+          const email = signUpForm.querySelector('input[type="email"]').value.trim();
+          const password = signUpForm.querySelector('input[type="password"]').value;
+          if (!username || !email || !password) {
+            showMessage('Please fill all fields.', true); return;
+          }
+          if (!isValidEmail(email)) {
+            showMessage('Invalid email format.', true); return;
+          }
+          if (!isStrongPassword(password)) {
+            showMessage('Password must be at least 6 characters, include a letter and a number.', true); return;
+          }
+          let users = getUsers();
+          if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+            showMessage('Username already exists.', true); return;
+          }
+          if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+            showMessage('Email already registered.', true); return;
+          }
+          // Email verification step
+          verificationCode = Math.floor(100000 + Math.random()*900000).toString();
+          localStorage.setItem('emailVerify_'+email, verificationCode);
+          signUpForm.style.display = 'none';
+          emailVerifyForm.style.display = '';
+          verifyMsg.textContent = 'Verification code sent! (Demo: ' + verificationCode + ')';
+          emailVerifyForm.onsubmit = function(ev) {
+            ev.preventDefault();
+            const code = document.getElementById('email-verify-code').value.trim();
+            if (code !== verificationCode) {
+              verifyMsg.textContent = 'Incorrect code.';
+              return;
+            }
+            // 2FA step
+            twoFACode = Math.floor(100000 + Math.random()*900000).toString();
+            localStorage.setItem('twoFA_'+email, twoFACode);
+            emailVerifyForm.style.display = 'none';
+            twoFAForm.style.display = '';
+            twofaMsg.textContent = '2FA code sent! (Demo: ' + twoFACode + ')';
+            twoFAForm.onsubmit = function(e2) {
+              e2.preventDefault();
+              const code2 = document.getElementById('twofa-code').value.trim();
+              if (code2 !== twoFACode) {
+                twofaMsg.textContent = 'Incorrect 2FA code.';
+                return;
+              }
+              // Save user
+              let isAdmin = false;
+              if (username === 'admin' && password === 'admin123') isAdmin = true;
+              users.push({ username, email, password: hash(password), isAdmin });
+              saveUsers(users);
+              showMessage('Sign up successful! You can now sign in.');
+              signIn();
+              signUpForm.reset();
+              twoFAForm.style.display = 'none';
+            };
+          };
+        };
+      }
+    });
     </script>
   </body>
 </html>
