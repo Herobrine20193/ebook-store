@@ -63,12 +63,14 @@
                 <span onclick="signUp()"> Sign Up </span>
                 <hr id="indicator" />
 
-                <form id="signInForm" name="myform">
-                  <input type="text" placeholder="Username" name="uname" />
-                  <span id="uname"></span>
-                  <input type="password" placeholder="Password" />
+                <form id="signInForm" name="myform" autocomplete="off" style="display:flex;flex-direction:column;gap:12px;align-items:stretch;">
+                  <label style="font-size:15px;color:#444;margin-bottom:2px;">Username</label>
+                  <input type="text" placeholder="Username" name="uname" autocomplete="username" />
+                  <span id="uname" style="display:block;height:18px;margin-bottom:2px;"></span>
+                  <label style="font-size:15px;color:#444;margin-bottom:2px;">Password</label>
+                  <input type="password" placeholder="Password" autocomplete="current-password" />
                   <button type="submit" class="btn">Sign In</button>
-                  <a href="#" id="forgotPwLink">Forgot password?</a>
+                  <a href="#" id="forgotPwLink" style="font-size:13px;color:#ff523b;text-align:right;margin-top:-8px;">Forgot password?</a>
     <!-- Forgot Password Modal -->
     <div id="forgotPwModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0008;z-index:9999;align-items:center;justify-content:center;">
       <div style="background:#fff;padding:32px 24px;border-radius:10px;max-width:350px;margin:auto;box-shadow:0 2px 16px #0003;">
@@ -140,10 +142,13 @@
     </script>
                 </form>
 
-                <form id="signUpForm">
-                  <input type="text" placeholder="Username" />
-                  <input type="email" placeholder="Email" />
-                  <input type="password" placeholder="Password" id="signup-password" />
+                <form id="signUpForm" autocomplete="off" style="display:flex;flex-direction:column;gap:12px;align-items:stretch;">
+                  <label style="font-size:15px;color:#444;margin-bottom:2px;">Username</label>
+                  <input type="text" placeholder="Username" autocomplete="username" />
+                  <label style="font-size:15px;color:#444;margin-bottom:2px;">Email</label>
+                  <input type="email" placeholder="Email" autocomplete="email" />
+                  <label style="font-size:15px;color:#444;margin-bottom:2px;">Password</label>
+                  <input type="password" placeholder="Password" id="signup-password" autocomplete="new-password" />
                   <div id="pw-strength" style="height:8px;width:100%;background:#eee;border-radius:4px;margin-bottom:8px;overflow:hidden;"><div id="pw-strength-bar" style="height:100%;width:0;background:#ff523b;transition:width 0.2s;"></div></div>
                   <div id="pw-strength-msg" style="font-size:12px;margin-bottom:8px;color:#888;"></div>
                   <button type="submit" class="btn">Sign Up</button>
@@ -159,7 +164,7 @@
                   <div id="twofa-msg" style="font-size:13px;margin-top:8px;"></div>
                 </form>
                 <div style="text-align:center;margin:18px 0 10px 0;color:#888;font-size:15px;">or sign in with</div>
-                <div style="display:flex;gap:1em;justify-content:center;margin-bottom:18px;flex-wrap:wrap;">
+                <div style="display:flex;gap:1em;justify-content:center;margin-bottom:18px;flex-wrap:wrap;z-index:2;position:relative;">
                   <button type="button" class="btn social-btn" id="google-login" style="background:#fff;color:#222;border:1px solid #ddd;display:flex;align-items:center;gap:6px;min-width:140px;justify-content:center;box-shadow:0 1px 6px #0001;transition:box-shadow 0.2s;">
                     <img src="images/google.png" alt="Google" style="width:20px;vertical-align:middle;">Google
                   </button>
@@ -400,18 +405,24 @@
     <!-- -----------------js for form validation ------------------ -->
     <script>
       function formvalidate() {
-        var ptrn = /^([^0-9\W]*)$/;
-        if (ptrn.test(document.myform.uname.value)) {
-          document.getElementById("uname").textContent = "User Name is Valid";
-          document.getElementById("uname").style.background = "#72EF57";
-          document.getElementById("uname").style.fontSize = "12px";
+        var unameInput = document.myform.uname;
+        var unameVal = unameInput.value;
+        var unameMsg = document.getElementById("uname");
+        var ptrn = /^([^0-9\W]+)$/;
+        if (!unameVal) {
+          unameMsg.textContent = "";
+          unameMsg.style.background = "none";
+        } else if (ptrn.test(unameVal)) {
+          unameMsg.textContent = "User Name is Valid";
+          unameMsg.style.background = "#72EF57";
+          unameMsg.style.fontSize = "12px";
         } else {
-          document.getElementById("uname").textContent = "User Name is Invalid";
-          document.getElementById("uname").style.background = "#EF6257";
-          document.getElementById("uname").style.fontSize = "12px";
+          unameMsg.textContent = "User Name is Invalid";
+          unameMsg.style.background = "#EF6257";
+          unameMsg.style.fontSize = "12px";
         }
       }
-      document.myform.uname.addEventListener("blur", formvalidate);
+      document.myform.uname.addEventListener("input", formvalidate);
     </script>
     <!-- --------- Show logged in user and sign out button --------- -->
     <script>
