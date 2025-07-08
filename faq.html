@@ -7,22 +7,130 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="navbar">
-      <div class="logo">
-        <a href="index.html">
-          <img src="images/EbookStore-Logo.png" alt="EbookStore-Logo" />
+  <div class="header">
+    <div class="container">
+      <div class="navbar">
+        <div class="logo">
+          <a href="index.html">
+            <img src="images/EbookStore-Logo.png" alt="EbookStore-Logo" />
+          </a>
+        </div>
+        <nav>
+          <ul id="MenuItems">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="ebooks.html">Ebooks</a></li>
+            <li><a href="account.html">Account</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+            <li id="admin-nav-item" style="display:none;"><a href="admin.html">Admin</a></li>
+            <li id="profile-nav-item" style="display:none;"><a href="profile.html">Profile</a></li>
+            <li id="wishlist-nav-item" style="display:none;"><a href="wishlist.html">Wishlist</a></li>
+          </ul>
+        </nav>
+        <a href="cart.html">
+          <img src="images/cart.png" alt="Shoping Cart" width="28px" height="28px" style="margin-left: 10px; margin-top: 15px" />
         </a>
+        <img src="images/menu.png" class="menu-icon" onclick="menutoggle()" />
       </div>
-      <nav>
-        <ul id="MenuItems">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="ebooks.html">Ebooks</a></li>
-          <li><a href="faq.html">FAQ</a></li>
-        </ul>
-      </nav>
     </div>
   </div>
+  <div class="newsletter" style="background:#fff;border-radius:12px;box-shadow:0 2px 12px #0001;padding:2em 1.5em 1.5em 1.5em;max-width:650px;margin:2em auto 2em auto;text-align:center;">
+    <h2 style="color:#ff523b;">Subscribe to our Newsletter</h2>
+    <p style="color:#444;">Get updates on new releases, offers, and more.</p>
+    <form id="newsletter-form" style="display:flex;gap:0.7em;justify-content:center;flex-wrap:wrap;margin-top:1em;">
+      <input type="email" id="newsletter-email" placeholder="Your email" required style="padding:8px 14px;border-radius:4px;border:1px solid #ddd;font-size:1em;min-width:220px;">
+      <button type="submit" class="btn" style="padding:8px 22px;">Subscribe</button>
+    </form>
+    <div id="newsletter-msg" style="margin-top:10px;font-size:1em;"></div>
+  </div>
+  <div class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="footer-col-1">
+          <h3>Download Our App</h3>
+          <p>Download App for Android and ios mobile phone.</p>
+          <div class="app-logo">
+            <img src="images/Playstore.png" />
+            <img src="images/Applestore.png" />
+          </div>
+        </div>
+        <div class="footer-col-2">
+          <img src="images/EbookStore-Logo-footer.png" />
+        </div>
+        <div class="footer-col-3">
+          <h3>Useful Links</h3>
+          <ul>
+            <li>Coupons</li>
+            <li>Blog Post</li>
+            <li>Return Policy</li>
+            <li>Join Affiliate</li>
+          </ul>
+        </div>
+        <div class="footer-col-4">
+          <h3>Follow us</h3>
+          <ul>
+            <li>Facebook</li>
+            <li>Youtube</li>
+            <li>Instagram</li>
+            <li>Twitterr</li>
+          </ul>
+        </div>
+      </div>
+      <hr />
+      <p class="copyright">Copyright 2025 - Readly</p>
+    </div>
+  </div>
+  <script>
+    // Show/hide nav items based on user session (copied from index.html)
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        var user = JSON.parse(localStorage.getItem('loggedInUser'));
+        var adminNav = document.getElementById('admin-nav-item');
+        var profileNav = document.getElementById('profile-nav-item');
+        var wishlistNav = document.getElementById('wishlist-nav-item');
+        if (user) {
+          if (profileNav) profileNav.style.display = '';
+          if (wishlistNav) wishlistNav.style.display = '';
+          if (user.isAdmin && adminNav) adminNav.style.display = '';
+          else if (adminNav) adminNav.style.display = 'none';
+        } else {
+          if (profileNav) profileNav.style.display = 'none';
+          if (wishlistNav) wishlistNav.style.display = 'none';
+          if (adminNav) adminNav.style.display = 'none';
+        }
+      } catch(e) {}
+    });
+    // Newsletter logic (copied from index.html)
+    document.getElementById('newsletter-form').onsubmit = function(e) {
+      e.preventDefault();
+      var email = document.getElementById('newsletter-email').value.trim();
+      if (!/^\S+@\S+\.\S+$/.test(email)) {
+        document.getElementById('newsletter-msg').textContent = 'Please enter a valid email.';
+        document.getElementById('newsletter-msg').style.color = '#ff523b';
+        return;
+      }
+      var subs = JSON.parse(localStorage.getItem('newsletterSubs')||'[]');
+      if (subs.includes(email)) {
+        document.getElementById('newsletter-msg').textContent = 'You are already subscribed!';
+        document.getElementById('newsletter-msg').style.color = '#ffb300';
+        return;
+      }
+      subs.push(email);
+      localStorage.setItem('newsletterSubs', JSON.stringify(subs));
+      document.getElementById('newsletter-msg').textContent = 'Thank you for subscribing!';
+      document.getElementById('newsletter-msg').style.color = '#72EF57';
+      document.getElementById('newsletter-form').reset();
+    };
+    // Menu toggle logic (copied from index.html)
+    var MenuItems = document.getElementById("MenuItems");
+    if (MenuItems) MenuItems.style.maxHeight = "0px";
+    function menutoggle() {
+      if (MenuItems.style.maxHeight == "0px") {
+        MenuItems.style.maxHeight = "200px";
+      } else {
+        MenuItems.style.maxHeight = "0px";
+      }
+    }
+  </script>
   <div class="small-container" style="max-width:700px;margin:2em auto 2em auto;background:#fff;border-radius:12px;box-shadow:0 2px 12px #0001;padding:2em 1.5em 1.5em 1.5em;">
     <h1 style="color:#ff523b;text-align:center;">FAQ & Help Center</h1>
     <div class="faq-item">
