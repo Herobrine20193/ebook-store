@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel | Ebookstore</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .admin-tabs { display: flex; gap: 20px; margin-bottom: 20px; }
+    .admin-tab { padding: 10px 24px; background: #eee; border-radius: 6px 6px 0 0; cursor: pointer; font-weight: 500; }
+    .admin-tab.active { background: #ff523b; color: #fff; }
+    .admin-section { background: #fff; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px #0001; padding: 24px; min-height: 300px; }
+    .admin-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .admin-table th, .admin-table td { border: 1px solid #eee; padding: 8px 12px; text-align: left; }
+    .admin-table th { background: #ff523b; color: #fff; }
+    .admin-table img { max-width: 40px; }
+    .admin-btn { background: #ff523b; color: #fff; border: none; border-radius: 4px; padding: 6px 14px; cursor: pointer; margin: 0 2px; }
+    .admin-btn:hover { background: #e04328; }
+    .admin-form input { margin: 0 8px 0 0; padding: 6px; border-radius: 4px; border: 1px solid #ccc; }
+    .admin-form { margin-bottom: 20px; }
+    .admin-title { margin-bottom: 10px; color: #ff523b; }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -27,7 +42,14 @@
   <div class="account-page">
     <div class="container">
       <h2>Admin Panel</h2>
-      <div id="admin-section"></div>
+      <div class="admin-tabs">
+        <div class="admin-tab active" data-tab="analytics">Analytics</div>
+        <div class="admin-tab" data-tab="books">Books</div>
+        <div class="admin-tab" data-tab="users">Users</div>
+        <div class="admin-tab" data-tab="orders">Orders</div>
+      </div>
+      <div id="admin-section" class="admin-section"></div>
+    <div id="admin-dialog" style="display:none;"></div>
     </div>
   </div>
   <script>
@@ -37,82 +59,190 @@
       document.getElementById('admin-section').innerHTML = '<p style="color:red;">Access denied. Only admin can view this page.</p>';
       throw new Error('Not admin');
     }
-    // Book management
-    let books = JSON.parse(localStorage.getItem('books_db') || '[]');
-    function saveBooks() { localStorage.setItem('books_db', JSON.stringify(books)); }
-    function renderBooks() {
-      let html = '<h3>Books</h3><table border="1" style="width:100%;margin-bottom:20px;"><tr><th>Title</th><th>Price</th><th>Image</th><th>Action</th></tr>';
+    // Tab logic
+    const tabs = document.querySelectorAll('.admin-tab');
+    tabs.forEach(tab => tab.onclick = function() {
+      tabs.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      renderAdmin(this.dataset.tab);
+    });
+
+    // --- Analytics Tab ---
+    function renderAnalytics() {
+      const a = window.getAnalyticsSummary();
+      let html = `<div class='admin-title'><b>Analytics Summary</b></div><div style='display:flex;gap:30px;flex-wrap:wrap;'>`;
+      html += `<div><b>Users:</b> ${a.userCount}</div>`;
+      html += `<div><b>Admins:</b> ${a.adminCount}</div>`;
+      html += `<div><b>Books:</b> ${a.bookCount}</div>`;
+      html += `<div><b>Orders:</b> ${a.orderCount}</div>`;
+      html += `<div><b>Revenue:</b> Rs${a.revenue}</div>`;
+      html += `</div>`;
+      document.getElementById('admin-section').innerHTML = html;
+    }
+
+    // --- Book Management ---
+    function renderBooks(filter='') {
+      let books = window.searchFilter('books', filter);
+      let html = `<div class='admin-title'><b>Books</b></div>`;
+      html += `<input id='book-search' placeholder='Search books...' style='margin-bottom:10px;padding:6px;width:220px;'>`;
+      html += `<button class='admin-btn' id='bulk-delete-books' style='margin-left:10px;'>Delete Selected</button>`;
+      html += `<table class='admin-table'><tr><th><input type='checkbox' id='select-all-books'></th><th>Title</th><th>Author</th><th>Price</th><th>Image</th><th>Action</th></tr>`;
       books.forEach((b,i) => {
-        html += `<tr><td>${b.title}</td><td>Rs${b.price}</td><td><img src="${b.image}" width="40"></td><td><button onclick="deleteBook(${i})">Delete</button></td></tr>`;
+        html += `<tr data-id='${b.id}'>`+
+          `<td><input type='checkbox' class='book-select'></td>`+
+          `<td class='editable' data-field='title'>${b.title}</td>`+
+          `<td class='editable' data-field='author'>${b.author||''}</td>`+
+          `<td class='editable' data-field='price'>${b.price}</td>`+
+          `<td><img src='${b.image}' style='max-width:40px;'></td>`+
+          `<td><button class='admin-btn edit-book'>Edit</button><button class='admin-btn delete-book'>Delete</button></td></tr>`;
       });
       html += '</table>';
-      html += `<h4>Add Book</h4><form id="addBookForm"><input type="text" id="btitle" placeholder="Title" required><input type="number" id="bprice" placeholder="Price" required><input type="text" id="bimg" placeholder="Image path" required><button type="submit">Add</button></form>`;
-      document.getElementById('admin-section').innerHTML = html + document.getElementById('admin-section').innerHTML;
+      html += `<form id="addBookForm" class="admin-form"><input type="text" id="btitle" placeholder="Title" required><input type="text" id="bauthor" placeholder="Author"><input type="number" id="bprice" placeholder="Price" required><input type="text" id="bimg" placeholder="Image path" required><button class="admin-btn" type="submit">Add Book</button></form>`;
+      document.getElementById('admin-section').innerHTML = html;
+
+      // Search
+      document.getElementById('book-search').oninput = function() { renderBooks(this.value); };
+      // Bulk select
+      document.getElementById('select-all-books').onchange = function() {
+        document.querySelectorAll('.book-select').forEach(cb => cb.checked = this.checked);
+      };
+      // Bulk delete
+      document.getElementById('bulk-delete-books').onclick = function() {
+        const ids = Array.from(document.querySelectorAll('.book-select:checked')).map(cb => cb.closest('tr').dataset.id);
+        if (!ids.length) return alert('No books selected.');
+        window.confirmAction('Delete selected books?', () => { window.bulkDelete('books', ids); renderBooks(); });
+      };
+      // Add book
       document.getElementById('addBookForm').onsubmit = function(e) {
         e.preventDefault();
-        books.push({ title: btitle.value, price: bprice.value, image: bimg.value });
-        saveBooks();
+        let books = JSON.parse(localStorage.getItem('books')||'[]');
+        let id = Date.now().toString();
+        books.push({ id, title: btitle.value, author: bauthor.value, price: bprice.value, image: bimg.value });
+        localStorage.setItem('books', JSON.stringify(books));
         renderBooks();
       };
+      // Edit/delete actions
+      document.querySelectorAll('.edit-book').forEach(btn => btn.onclick = function() {
+        const tr = this.closest('tr');
+        if (tr.classList.contains('editing')) return;
+        tr.classList.add('editing');
+        const fields = ['title','author','price'];
+        fields.forEach(f => {
+          const td = tr.querySelector(`[data-field='${f}']`);
+          td.innerHTML = `<input value="${td.textContent}" style='width:90px;'>`;
+        });
+        this.textContent = 'Save';
+        this.onclick = function() {
+          const id = tr.dataset.id;
+          const newData = {};
+          fields.forEach(f => {
+            newData[f] = tr.querySelector(`[data-field='${f}'] input`).value;
+          });
+          window.editBook(id, newData);
+          renderBooks();
+        };
+        // Add cancel button
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'admin-btn';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.onclick = function() { renderBooks(); };
+        this.parentNode.appendChild(cancelBtn);
+      });
+      document.querySelectorAll('.delete-book').forEach(btn => btn.onclick = function() {
+        const id = this.closest('tr').dataset.id;
+        window.confirmAction('Delete this book?', () => { window.bulkDelete('books', [id]); renderBooks(); });
+      });
     }
-    window.deleteBook = function(idx) {
-      books.splice(idx,1);
-      saveBooks();
-      renderBooks();
-    };
-    // User management (with admin toggle)
-    function renderUsers() {
-      let users = JSON.parse(localStorage.getItem('users')||'[]');
-      let html = '<h3>Users</h3><table border="1" style="width:100%;margin-bottom:20px;"><tr><th>Username</th><th>Email</th><th>Admin</th><th>Action</th></tr>';
+
+    // --- User Management ---
+    function renderUsers(filter='') {
+      let users = window.searchFilter('users', filter);
+      let html = `<div class='admin-title'><b>Users</b></div>`;
+      html += `<input id='user-search' placeholder='Search users...' style='margin-bottom:10px;padding:6px;width:220px;'>`;
+      html += `<button class='admin-btn' id='bulk-delete-users' style='margin-left:10px;'>Delete Selected</button>`;
+      html += `<table class='admin-table'><tr><th><input type='checkbox' id='select-all-users'></th><th>Username</th><th>Email</th><th>Admin</th><th>Action</th></tr>`;
       users.forEach((u,i) => {
-        html += `<tr><td>${u.username}</td><td>${u.email}</td><td>${u.isAdmin ? 'Yes' : 'No'} <button onclick="toggleAdmin(${i})">${u.isAdmin ? 'Remove' : 'Make'} Admin</button></td><td><button onclick="deleteUser(${i})">Delete</button></td></tr>`;
+        html += `<tr data-username='${u.username}'>`+
+          `<td><input type='checkbox' class='user-select'></td>`+
+          `<td>${u.username}</td>`+
+          `<td>${u.email}</td>`+
+          `<td>${u.isAdmin ? 'Yes' : 'No'} <button class='admin-btn toggle-admin'>${u.isAdmin ? 'Demote' : 'Promote'} Admin</button></td>`+
+          `<td><button class='admin-btn delete-user'>Delete</button></td></tr>`;
       });
       html += '</table>';
-      document.getElementById('admin-section').innerHTML += html;
-    }
-    window.toggleAdmin = function(idx) {
-      let users = JSON.parse(localStorage.getItem('users')||'[]');
-      users[idx].isAdmin = !users[idx].isAdmin;
-      localStorage.setItem('users', JSON.stringify(users));
-      // If demoting self, log out
-      let logged = JSON.parse(localStorage.getItem('loggedInUser'));
-      if (logged && logged.username === users[idx].username && !users[idx].isAdmin) {
-        localStorage.removeItem('loggedInUser');
-        alert('You have removed your own admin access. Logging out.');
-        window.location.href = 'account.html';
-        return;
-      }
-      renderAdmin();
-    };
-    window.deleteUser = function(idx) {
-      let users = JSON.parse(localStorage.getItem('users')||'[]');
-      users.splice(idx,1);
-      localStorage.setItem('users', JSON.stringify(users));
-      renderAdmin();
-    };
-    // Orders management
-    function renderOrders() {
-      let html = '<h3>Orders</h3>';
-      let users = JSON.parse(localStorage.getItem('users')||'[]');
-      users.forEach(u => {
-        let orders = JSON.parse(localStorage.getItem('orders_'+u.username)||'[]');
-        if (orders.length) {
-          html += `<b>${u.username}</b><ul>`;
-          orders.forEach(o => {
-            html += `<li>Rs${o.total} on ${o.date} (${o.items.length} items)</li>`;
-          });
-          html += '</ul>';
+      document.getElementById('admin-section').innerHTML = html;
+      // Search
+      document.getElementById('user-search').oninput = function() { renderUsers(this.value); };
+      // Bulk select
+      document.getElementById('select-all-users').onchange = function() {
+        document.querySelectorAll('.user-select').forEach(cb => cb.checked = this.checked);
+      };
+      // Bulk delete
+      document.getElementById('bulk-delete-users').onclick = function() {
+        const ids = Array.from(document.querySelectorAll('.user-select:checked')).map(cb => cb.closest('tr').dataset.username);
+        if (!ids.length) return alert('No users selected.');
+        window.confirmAction('Delete selected users?', () => { window.bulkDelete('users', ids); renderUsers(); });
+      };
+      // Toggle admin
+      document.querySelectorAll('.toggle-admin').forEach(btn => btn.onclick = function() {
+        const username = this.closest('tr').dataset.username;
+        const isAdmin = this.textContent.includes('Demote') ? false : true;
+        window.setAdminStatus(username, isAdmin);
+        // If demoting self, log out
+        if (username === user.username && !isAdmin) {
+          localStorage.removeItem('loggedInUser');
+          alert('You have removed your own admin access. Logging out.');
+          window.location.href = 'account.html';
+          return;
         }
+        renderUsers();
       });
-      document.getElementById('admin-section').innerHTML += html;
+      // Delete user
+      document.querySelectorAll('.delete-user').forEach(btn => btn.onclick = function() {
+        const username = this.closest('tr').dataset.username;
+        window.confirmAction('Delete this user?', () => { window.bulkDelete('users', [username]); renderUsers(); });
+      });
     }
-    function renderAdmin() {
-      document.getElementById('admin-section').innerHTML = '';
-      renderBooks();
-      renderUsers();
-      renderOrders();
+
+    // --- Orders Management ---
+    function renderOrders(filter='') {
+      let orders = window.searchFilter('orders', filter);
+      let html = `<div class='admin-title'><b>Orders</b></div>`;
+      html += `<input id='order-search' placeholder='Search orders...' style='margin-bottom:10px;padding:6px;width:220px;'>`;
+      html += `<table class='admin-table'><tr><th>ID</th><th>User</th><th>Total</th><th>Date</th><th>Items</th><th>Details</th></tr>`;
+      orders.forEach(o => {
+        html += `<tr data-id='${o.id}'>`+
+          `<td>${o.id}</td>`+
+          `<td>${o.username}</td>`+
+          `<td>Rs${o.total}</td>`+
+          `<td>${o.date||''}</td>`+
+          `<td>${o.items ? o.items.length : 0}</td>`+
+          `<td><button class='admin-btn order-details'>View</button></td></tr>`;
+      });
+      html += '</table>';
+      document.getElementById('admin-section').innerHTML = html;
+      // Search
+      document.getElementById('order-search').oninput = function() { renderOrders(this.value); };
+      // Details
+      document.querySelectorAll('.order-details').forEach(btn => btn.onclick = function() {
+        const id = this.closest('tr').dataset.id;
+        const o = window.getOrderDetails(id);
+        let msg = `<b>Order #${o.id}</b><br>User: ${o.username}<br>Total: Rs${o.total}<br>Date: ${o.date}<br>Items:<ul>`;
+        o.items.forEach(it => { msg += `<li>${it.title} x${it.qty} (Rs${it.price})</li>`; });
+        msg += '</ul>';
+        alert(msg);
+      });
     }
-    renderAdmin();
+
+    // --- Main render function ---
+    function renderAdmin(tab) {
+      if (!tab) tab = document.querySelector('.admin-tab.active').dataset.tab;
+      if (tab === 'analytics') renderAnalytics();
+      else if (tab === 'books') renderBooks();
+      else if (tab === 'users') renderUsers();
+      else if (tab === 'orders') renderOrders();
+    }
+    renderAdmin('analytics');
   </script>
 </body>
 </html>
